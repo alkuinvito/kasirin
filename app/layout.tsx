@@ -1,5 +1,5 @@
 import "./globals.css";
-import Header from "@/components/layout/header";
+import Header from "@/app/components/layout/header";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
 

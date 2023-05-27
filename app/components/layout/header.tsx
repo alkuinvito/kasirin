@@ -6,7 +6,7 @@ import Hamburger from "./hamburger";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import "@/components/styles/Header.css";
+import "@/app/components/styles/header.css";
 
 export default function Header() {
   return (
