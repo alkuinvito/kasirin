@@ -2,6 +2,8 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 import GoogleProvider from "next-auth/providers/google";
+import { GetUserByID } from "@/app/api/auth/lib/repository";
+import { Role } from "@/types/next-auth";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -12,6 +14,26 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      GetUserByID(user.id)
+        .then((result) => {
+          if (result?.role) {
+            switch (result.role) {
+              case "admin":
+                user.role = Role.admin;
+                break;
+              case "user":
+                user.role = Role.user;
+                break;
+            }
+            return true;
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+      return false;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
