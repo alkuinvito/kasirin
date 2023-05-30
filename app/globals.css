@@ -14,13 +14,3 @@
     color: #cacaca;
   }
 }
-
-.products {
-  margin-bottom: 2em;
-  min-height: 240px;
-  display: grid;
-  list-style: none;
-  grid-template-columns: repeat(auto-fill, 180px);
-  justify-content: space-evenly;
-  gap: 24px;
-}
