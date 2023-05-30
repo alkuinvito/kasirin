@@ -22,7 +22,7 @@ export default function RootLayout({
         <Suspense fallback="...">
           <Header />
         </Suspense>
-        <main className="mt-14">{children}</main>
+        <main className="mt-20 max-w-7xl mx-auto">{children}</main>
       </body>
     </html>
   );
