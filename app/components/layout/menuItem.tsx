@@ -1,5 +1,10 @@
-"use client";
 import Image from "next/image";
+
+export interface Menu {
+  image: string;
+  name: string;
+  price: number;
+}
 
 export default function MenuItem({
   image,
@@ -20,7 +25,7 @@ export default function MenuItem({
         height={100}
       ></Image>
       <div className="grid pt-2">
-        <b className="text-bold">{name}</b>
+        <span className="font-semibold">{name}</span>
         <span className="text-sm">{price}</span>
       </div>
     </div>

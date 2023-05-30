@@ -1,0 +1,22 @@
+.AccordionContent {
+  display: grid;
+  list-style: none;
+  grid-template-columns: repeat(auto-fill, 180px);
+  justify-content: space-around;
+  gap: 2rem;
+}
+.AccordionTrigger {
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 0.5rem;
+}
+.AccordionChevron {
+  width: 24px;
+  height: 24px;
+  transition: transform 300ms;
+}
+.AccordionTrigger[data-state="open"] > .AccordionChevron {
+  transform: rotate(180deg);
+}
