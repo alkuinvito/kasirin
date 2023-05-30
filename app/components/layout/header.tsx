@@ -23,7 +23,7 @@ export default function Header() {
           <NavigationMenu.Item>
             <NavigationMenu.Link
               className="NavigationMenuLink"
-              href="http://localhost:3000"
+              href="./"
               >
               Dashboard
             </NavigationMenu.Link>
@@ -32,7 +32,7 @@ export default function Header() {
           <NavigationMenu.Item>
             <NavigationMenu.Link
               className="NavigationMenuLink"
-              href="http://localhost:3000/transaction"
+              href="/transaction"
             >
               Transaction
             </NavigationMenu.Link>
