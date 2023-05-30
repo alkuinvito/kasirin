@@ -41,12 +41,16 @@ export default function Header() {
             Rp 7.000.000
           </p>
           <Popover.Trigger asChild>
-            <button className="IconButton" aria-label="Profile">
+            <button
+              className="IconButton bg-gray-300 dark:bg-gray-900"
+              aria-label="Profile"
+            >
               <Image
                 src={"https://github.com/alkuinvito.png"}
-                width={30}
-                height={30}
+                width={40}
+                height={40}
                 alt="user profile"
+                className="rounded-full"
               ></Image>
             </button>
           </Popover.Trigger>
