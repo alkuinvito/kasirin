@@ -10,20 +10,22 @@ import "@/app/components/styles/header.css";
 
 export default function Header() {
   return (
-    <div className="flex justify-between items-center shadow-lg backdrop-blur-md fixed top-0 w-full p-2">
+    <div className="shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-black/50">
+      <div className="wrapper max-w-7xl w-full h-full flex justify-between items-center mx-auto">
+
       <Hamburger />
-      <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-bold text-2xl ">
+      <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-semibold text-3xl">
         KasirIn
       </h1>
 
-      <NavigationMenu.Root className="NavigationMenuRoot hidden sm:flex">
-        <NavigationMenu.List className="NavigationMenuList">
+      <NavigationMenu.Root className="hidden sm:flex mx-auto p-[3px] justify-around rounded-lg bg-gray-400/10">
+        <NavigationMenu.List className="NavigationMenuList py-2 px-8 outline-none select-none font-medium leading-none rounded text-lg flex items-center justify-between gap-[2px] data-[highlighted]:bg-gray-600/10 data-[state=open]:bg-gray-600/10">
           <NavigationMenu.Item>
             <NavigationMenu.Link
               className="NavigationMenuLink"
               href="http://localhost:3000"
-            >
-              Menu
+              >
+              Dashboard
             </NavigationMenu.Link>
           </NavigationMenu.Item>
 
@@ -43,13 +45,13 @@ export default function Header() {
           Rp 7.000.000
         </p>
         <Popover.Trigger asChild>
-          <button className="IconButton" aria-label="Update dimensions">
+          <button className="IconButton" aria-label="Profile">
             <Image
               src={"https://github.com/alkuinvito.png"}
               width={30}
               height={30}
               alt="user profile"
-            ></Image>
+              ></Image>
           </button>
         </Popover.Trigger>
         <Popover.Portal>
@@ -66,6 +68,7 @@ export default function Header() {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
+      </div>
     </div>
   );
 }
