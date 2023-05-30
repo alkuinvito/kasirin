@@ -55,18 +55,17 @@ export default function Header() {
             </button>
           </Popover.Trigger>
           <Popover.Portal>
-            <Popover.Content className="PopoverContent" sideOffset={5}>
+            <Popover.Content
+              className="PopoverContent bg-white dark:bg-slate-800 shadow-lg"
+              sideOffset={10}
+              align="end"
+              side="top"
+            >
               <div
                 style={{ display: "flex", flexDirection: "column", gap: 10 }}
               >
-                <p className="Text" style={{ marginBottom: 10 }}>
-                  John Doe
-                </p>
+                <h3 className="font-semibold">John Doe</h3>
               </div>
-              <Popover.Close className="PopoverClose" aria-label="Close">
-                <Cross2Icon />
-              </Popover.Close>
-              <Popover.Arrow className="PopoverArrow" />
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
