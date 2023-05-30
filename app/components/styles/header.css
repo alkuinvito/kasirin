@@ -60,25 +60,26 @@ p {
   padding: 20px;
   width: 260px;
   background-color: white;
-  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
 }
 .PopoverContent:focus {
-  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px,
-    0 0 0 2px var(--violet7);
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px, 0 0 0 2px var(--violet7);
 }
-.PopoverContent[data-state='open'][data-side='top'] {
+.PopoverContent[data-state="open"][data-side="top"] {
   animation-name: slideDownAndFade;
 }
-.PopoverContent[data-state='open'][data-side='right'] {
+.PopoverContent[data-state="open"][data-side="right"] {
   animation-name: slideLeftAndFade;
 }
-.PopoverContent[data-state='open'][data-side='bottom'] {
+.PopoverContent[data-state="open"][data-side="bottom"] {
   animation-name: slideUpAndFade;
 }
-.PopoverContent[data-state='open'][data-side='left'] {
+.PopoverContent[data-state="open"][data-side="left"] {
   animation-name: slideRightAndFade;
 }
 
@@ -95,14 +96,12 @@ p {
   align-items: center;
   justify-content: center;
   color: var(--violet11);
-  background-color: white;
   box-shadow: 0 2px 10px var(--blackA7);
+  cursor: pointer;
 }
-.IconButton:hover {
-  background-color: var(--violet3);
-}
+
 .IconButton:focus {
-  box-shadow: 0 0 0 2px black;
+  box-shadow: 0 0 0 2px var(--violet11);
 }
 
 .Fieldset {
