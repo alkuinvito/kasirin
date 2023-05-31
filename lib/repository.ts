@@ -1,4 +1,4 @@
-import { prisma } from "@/app/server/db";
+import { prisma } from "@/lib/db";
 
 /** GetUserByID find a user using the given user id
  */

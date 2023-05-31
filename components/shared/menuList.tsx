@@ -4,7 +4,6 @@ import React from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import MenuItem, { Menu } from "./menuItem";
-import "@/app/components/styles/menuList.css";
 
 export interface Menus {
   name: string;

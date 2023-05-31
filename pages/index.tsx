@@ -1,6 +1,6 @@
 import React from "react";
-import OrderList from "./components/layout/orderList";
-import MenuList from "./components/layout/menuList";
+import OrderList from "../components/shared/orderList";
+import MenuList from "../components/shared/menuList";
 
 export default function Home() {
   return (

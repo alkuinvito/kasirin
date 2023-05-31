@@ -7,8 +7,8 @@ import {
 } from "next-auth";
 import { getProviders } from "next-auth/react";
 import GoogleProvider from "next-auth/providers/google";
-import { prisma } from "@/app/server/db";
-import { GetUserByID } from "../api/auth/lib/repository";
+import { prisma } from "@/lib/db";
+import { GetUserByID } from "@/lib/repository";
 
 export enum Role {
   user = "user",
