@@ -10,26 +10,30 @@ export default function SignIn({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <>
+    <div className="rounded-lg bg-slate-800 max-w-md p-4 mx-auto">
       {Object.values(providers).map((provider) => (
-        <div key={provider.name}>
+        <div
+          key={provider.name}
+          className="bg-slate-600 p-2 rounded-md cursor-pointer"
+        >
           <button onClick={() => signIn(provider.id)}>
             Sign in with {provider.name}
           </button>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
 
-  // If the user is already logged in, redirect.
-  // Note: Make sure not to redirect to the same page
-  // To avoid an infinite loop!
+  const { redirectUrl } = context.query;
+
   if (session) {
-    return { redirect: { destination: "/" } };
+    return {
+      redirect: { destination: redirectUrl === "/admin" ? "/admin" : "/" },
+    };
   }
 
   const providers = await getProviders();
