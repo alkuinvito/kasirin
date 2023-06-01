@@ -5,10 +5,8 @@ import {
   type NextAuthOptions,
   type DefaultUser,
 } from "next-auth";
-import { getProviders } from "next-auth/react";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/db";
-import { GetUserByID } from "@/lib/repository";
 
 export enum Role {
   user = "user",
@@ -36,25 +34,14 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
     async signIn({ user }) {
-      GetUserByID(user.id)
-        .then((result) => {
-          if (result?.role) {
-            switch (result.role) {
-              case "admin":
-                user.role = Role.admin;
-                break;
-              case "user":
-                user.role = Role.user;
-                break;
-            }
-            return true;
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      if (user.role === Role.admin || user.role === Role.user) {
+        return true;
+      }
       return false;
     },
     async jwt({ token, user }) {
@@ -64,7 +51,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token) {
+      if (session.user) {
         session.user.role = token.role;
       }
       return session;
@@ -78,18 +65,3 @@ export const getServerAuthSession = (ctx: {
 }) => {
   return getServerSession(ctx.req, ctx.res, authOptions);
 };
-
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerSession(ctx.req, ctx.res, authOptions);
-
-  if (session) {
-    return { redirect: { destination: "/" } };
-  }
-
-  const providers = await getProviders();
-  console.log(`providers: {providers}`);
-
-  return {
-    props: { providers: providers ?? [] },
-  };
-}
