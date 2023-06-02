@@ -7,11 +7,10 @@ import {
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
 
-export enum Role {
-  user = "user",
-  admin = "admin",
-}
+export const Role = z.enum(["admin", "user"]);
+type Role = z.infer<typeof Role>;
 
 interface IUser extends DefaultUser {
   role?: Role;
@@ -39,9 +38,37 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user }) {
-      if (user.role === Role.admin || user.role === Role.user) {
+      if (user.role === Role.enum.admin || user.role === Role.enum.user) {
         return true;
       }
+
+      const result = await prisma.user.count({
+        where: {
+          role: "admin",
+        },
+      });
+      if (result === 0) {
+        user.role = Role.enum.admin;
+        return true;
+      }
+
+      if (user.email) {
+        const invited = await prisma.invitation.findUnique({
+          where: {
+            email: user.email,
+          },
+        });
+        if (invited) {
+          user.role = Role.parse(invited.role);
+          await prisma.invitation.delete({
+            where: {
+              email: user.email,
+            },
+          });
+          return true;
+        }
+      }
+
       return false;
     },
     async jwt({ token, user }) {

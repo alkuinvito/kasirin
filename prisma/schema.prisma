@@ -56,6 +56,12 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model Invitation {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  role  String
+}
+
 model Product {
   id    String @id @default(cuid())
   name  String
@@ -77,6 +83,6 @@ model Transaction {
   id     String @id @default(cuid())
   userId String
   date   DateTime @default(now())
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
 }
