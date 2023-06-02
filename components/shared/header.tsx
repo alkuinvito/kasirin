@@ -12,7 +12,7 @@ import { signOut } from "next-auth/react";
 export default function Header() {
   const { data: session } = useSession();
   return (
-    <div className="shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
+    <div className="z-50 shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
       <div className="wrapper max-w-7xl w-full h-full flex justify-between items-center mx-auto">
         <Hamburger />
         <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-semibold text-3xl">
