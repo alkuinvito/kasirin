@@ -10,13 +10,13 @@ export default function SignIn({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <div className="rounded-lg bg-slate-800 max-w-md p-4 mx-auto">
+    <div className="max-w-md p-4 mx-auto rounded-lg bg-slate-800">
       {Object.values(providers).map((provider) => (
-        <div
-          key={provider.name}
-          className="bg-slate-600 p-2 rounded-md cursor-pointer"
-        >
-          <button onClick={() => signIn(provider.id)}>
+        <div key={provider.name}>
+          <button
+            onClick={() => signIn(provider.id)}
+            className="py-2 px-3 w-full box-border rounded-md text-center bg-blue-700 hover:bg-blue-800 font-semibold cursor-pointer"
+          >
             Sign in with {provider.name}
           </button>
         </div>
