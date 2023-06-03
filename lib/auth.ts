@@ -7,10 +7,7 @@ import {
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/db";
-import { z } from "zod";
-
-export const Role = z.enum(["admin", "user"]);
-type Role = z.infer<typeof Role>;
+import { Role } from "./schema";
 
 interface IUser extends DefaultUser {
   role?: Role;

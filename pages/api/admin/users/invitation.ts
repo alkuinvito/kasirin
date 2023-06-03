@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { Role } from "@/lib/auth";
+import { Role } from "@/lib/schema";
 
 const schema = z.object({
   email: z.string().email(),
@@ -54,9 +54,9 @@ export default async function handler(
       }
       break;
     case "GET":
-      const users = await prisma.user.findMany();
+      const invitations = await prisma.invitation.findMany();
       return res.status(200).json({
-        users,
+        invitations,
       });
     default:
       return res.status(405).send({
