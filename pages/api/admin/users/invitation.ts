@@ -25,8 +25,8 @@ export default async function handler(
         });
 
         if (user) {
-          return res.status(400).send({
-            error: `member with this email already exist`,
+          return res.status(400).json({
+            error: "Member with this email already exist",
           });
         }
 
@@ -43,13 +43,13 @@ export default async function handler(
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
-            return res.status(400).send({
-              error: `invitation with this email already exist`,
+            return res.status(400).json({
+              error: "Invitation with this email already exist",
             });
           }
         }
-        return res.status(400).send({
-          error: `invalid body request`,
+        return res.status(400).json({
+          error: "Invalid body request",
         });
       }
       break;
@@ -59,8 +59,8 @@ export default async function handler(
         invitations,
       });
     default:
-      return res.status(405).send({
-        error: `invalid method`,
+      return res.status(405).json({
+        error: "Invalid method",
       });
   }
 }
