@@ -14,12 +14,9 @@ import {
 import { InvitationModelSchema, InvitationModel } from "@/lib/schema";
 
 const getInvitations = async () => {
-  const { data } = await axios.get(
-    process.env.NEXT_PUBLIC_APP_HOST + "/api/admin/users/invitation",
-    {
-      withCredentials: true,
-    }
-  );
+  const { data } = await axios.get("/api/admin/users/invitation", {
+    withCredentials: true,
+  });
   return z.array(InvitationModelSchema).parse(data.invitations);
 };
 

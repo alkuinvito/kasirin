@@ -5,12 +5,9 @@ import Invitation from "@/components/admin/invitation";
 import { useEffect, useState } from "react";
 
 const getUsers = async () => {
-  const { data } = await axios.get(
-    process.env.NEXT_PUBLIC_APP_HOST + "/api/admin/users",
-    {
-      withCredentials: true,
-    }
-  );
+  const { data } = await axios.get("/api/admin/users", {
+    withCredentials: true,
+  });
   return z.array(UserModelSchema).parse(data.users);
 };
 
