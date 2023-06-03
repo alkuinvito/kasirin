@@ -10,8 +10,11 @@ import {
   CheckIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  Cross1Icon,
 } from "@radix-ui/react-icons";
 import { InvitationModelSchema, InvitationModel } from "@/lib/schema";
+import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
+import { Toast } from "../shared/toast";
 
 const getInvitations = async () => {
   const { data } = await axios.get("/api/admin/users/invitation", {
@@ -61,8 +64,9 @@ const renderInvitations = (invitations: InvitationModel[]): JSX.Element => {
 export default function Invitation() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
-  const [error, setError] = useState(null);
   const [invitations, setInvitations] = useState(<></>);
+  const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     getInvitations().then((res) => {
@@ -72,6 +76,8 @@ export default function Invitation() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
+
     var options = {
       method: "POST",
       url: "/api/admin/users/invitation",
@@ -87,11 +93,28 @@ export default function Invitation() {
           setInvitations(renderInvitations(res));
         });
       })
-      .catch(setError);
+      .catch((err) => {
+        const result = z.string().safeParse(err.response.data.error);
+        if (result.success) {
+          setError(result.data);
+          setOpen(true);
+        }
+      });
   };
 
   return (
-    <>
+    <ToastProvider swipeDirection="right">
+      <Toast
+        className="bg-red-800"
+        title="Failed to create invitation"
+        content={error}
+        open={open}
+        setOpen={setOpen}
+      >
+        <button onClick={() => setOpen(false)}>
+          <Cross1Icon />
+        </button>
+      </Toast>
       <h2 className="mt-8 font-semibold text-xl">Invitations</h2>
       <div className="mt-4 p-4 max-w-lg rounded-lg bg-gray-100 dark:bg-slate-900">
         {invitations}
@@ -107,7 +130,7 @@ export default function Invitation() {
               onChange={(e) => {
                 setEmail(e.target.value);
               }}
-              className="font-medium w-full py-2 px-3 bg-gray-100 dark:bg-slate-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-800"
+              className="w-full py-2 px-3 bg-gray-100 dark:bg-slate-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800"
               placeholder="new.user@gmail.com"
               type="email"
               required
@@ -167,6 +190,7 @@ export default function Invitation() {
           </button>
         </Form.Submit>
       </Form.Root>
-    </>
+      <ToastViewport className="fixed bottom-0 right-0 flex flex-col gap-3 w-96 max-w-[100vw] m-0 z-50 outline-none p-6" />
+    </ToastProvider>
   );
 }
