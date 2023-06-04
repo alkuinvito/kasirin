@@ -11,6 +11,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   Cross1Icon,
+  TrashIcon,
 } from "@radix-ui/react-icons";
 import { InvitationModelSchema, InvitationModel } from "@/lib/schema";
 import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
@@ -53,7 +54,9 @@ const renderInvitations = (invitations: InvitationModel[]): JSX.Element => {
           <td className="p-2">{invitation.email}</td>
           <td className="p-2">{invitation.role}</td>
           <td className="p-2">
-            <button>Delete</button>
+            <button className="block mx-auto cursor-pointer">
+              <TrashIcon className="w-5 h-5 text-red-700" />
+            </button>
           </td>
         </tr>
       ))}
@@ -105,7 +108,7 @@ export default function Invitation() {
   return (
     <ToastProvider swipeDirection="right">
       <Toast
-        className="bg-red-800"
+        className="text-white bg-red-500 dark:bg-red-800"
         title="Failed to create invitation"
         content={error}
         open={open}

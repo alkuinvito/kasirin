@@ -3,6 +3,7 @@ import axios from "axios";
 import { z } from "zod";
 import Invitation from "@/components/admin/invitation";
 import { useEffect, useState } from "react";
+import { Pencil2Icon } from "@radix-ui/react-icons";
 
 const getUsers = async () => {
   const { data } = await axios.get("/api/admin/users", {
@@ -29,7 +30,9 @@ const renderUsers = (users: UserModel[]): JSX.Element => {
           <td className="p-2">{user.email}</td>
           <td className="p-2">{user.role}</td>
           <td className="p-2">
-            <button>Edit</button>
+            <button className="block mx-auto cursor-pointer">
+              <Pencil2Icon className="w-5 h-5" />
+            </button>
           </td>
         </tr>
       ))}
