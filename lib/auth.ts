@@ -35,7 +35,8 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user }) {
-      if (user.role === Role.enum.admin || user.role === Role.enum.user) {
+      const parsedRole = Role.safeParse(user.role);
+      if (parsedRole.success) {
         return true;
       }
 
@@ -55,14 +56,19 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
           },
         });
+
         if (invited) {
-          user.role = Role.parse(invited.role);
-          await prisma.invitation.delete({
-            where: {
-              email: user.email,
-            },
-          });
-          return true;
+          const result = Role.safeParse(invited.role);
+          if (result.success) {
+            user.role = result.data;
+            await prisma.invitation.delete({
+              where: {
+                email: user.email,
+              },
+            });
+            return true;
+          }
+          return false;
         }
       }
 
