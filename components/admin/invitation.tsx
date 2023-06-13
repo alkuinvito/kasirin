@@ -17,59 +17,78 @@ import { InvitationModelSchema, InvitationModel } from "@/lib/schema";
 import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
 import { Toast } from "../shared/toast";
 
-const getInvitations = async () => {
-  const { data } = await axios.get("/api/admin/users/invitation", {
-    withCredentials: true,
-  });
-  return z.array(InvitationModelSchema).parse(data.invitations);
-};
-
-const renderInvitations = (invitations: InvitationModel[]): JSX.Element => {
-  if (invitations.length === 0) {
-    return (
-      <>
-        <table className="w-full text-left">
-          <tr className="border-y border-gray-300 dark:border-slate-700">
-            <th className="p-2">Email</th>
-            <th className="p-2">Role</th>
-            <th className="p-2"></th>
-          </tr>
-        </table>
-        <span className="mt-2 block text-center">No invitation to show</span>
-      </>
-    );
-  }
-  return (
-    <table className="w-full text-left">
-      <tr className="border-y border-gray-300 dark:border-slate-700">
-        <th className="p-2">Email</th>
-        <th className="p-2">Role</th>
-        <th className="p-2"></th>
-      </tr>
-      {invitations.map((invitation) => (
-        <tr
-          key={invitation.id}
-          className="border-y border-gray-300 dark:border-slate-700"
-        >
-          <td className="p-2">{invitation.email}</td>
-          <td className="p-2">{invitation.role}</td>
-          <td className="p-2">
-            <button className="block mx-auto cursor-pointer">
-              <TrashIcon className="w-5 h-5 text-red-700" />
-            </button>
-          </td>
-        </tr>
-      ))}
-    </table>
-  );
-};
-
 export default function Invitation() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
   const [invitations, setInvitations] = useState(<></>);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+
+  const handleDelete = async (email: string) => {
+    var options = {
+      method: "PATCH",
+      url: "/api/admin/users/invitation",
+      data: { email: email },
+    };
+
+    return axios.request(options);
+  };
+
+  const getInvitations = async () => {
+    const { data } = await axios.get("/api/admin/users/invitation", {
+      withCredentials: true,
+    });
+    return z.array(InvitationModelSchema).parse(data.invitations);
+  };
+
+  const renderInvitations = (invitations: InvitationModel[]): JSX.Element => {
+    if (invitations.length === 0) {
+      return (
+        <>
+          <table className="w-full text-left">
+            <tr className="border-y border-gray-300 dark:border-slate-700">
+              <th className="p-2">Email</th>
+              <th className="p-2">Role</th>
+              <th className="p-2"></th>
+            </tr>
+          </table>
+          <span className="mt-2 block text-center">No invitation to show</span>
+        </>
+      );
+    }
+    return (
+      <table className="w-full text-left">
+        <tr className="border-y border-gray-300 dark:border-slate-700">
+          <th className="p-2">Email</th>
+          <th className="p-2">Role</th>
+          <th className="p-2"></th>
+        </tr>
+        {invitations.map((invitation) => (
+          <tr
+            key={invitation.id}
+            className="border-y border-gray-300 dark:border-slate-700"
+          >
+            <td className="p-2">{invitation.email}</td>
+            <td className="p-2">{invitation.role}</td>
+            <td className="p-2">
+              <button className="block mx-auto cursor-pointer">
+                <TrashIcon
+                  className="w-5 h-5 text-red-700"
+                  onClick={() => {
+                    handleDelete(invitation.email).then(() => {
+                      getInvitations().then((res) => {
+                        setInvitations(renderInvitations(res));
+                      });
+                    });
+                  }}
+                />
+              </button>
+            </td>
+          </tr>
+        ))}
+      </table>
+    );
+  };
 
   useEffect(() => {
     getInvitations().then((res) => {

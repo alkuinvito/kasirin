@@ -9,6 +9,8 @@ const schema = z.object({
   role: Role,
 });
 
+const deletedReq = z.object({ email: z.string().email() });
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -57,6 +59,27 @@ export default async function handler(
       const invitations = await prisma.invitation.findMany();
       return res.status(200).json({
         invitations,
+      });
+    case "PATCH":
+      const data = deletedReq.safeParse(req.body);
+      if (data.success) {
+        try {
+          const deleted = await prisma.invitation.delete({
+            where: {
+              email: data.data.email,
+            },
+          });
+          return res.status(200).json({
+            message: `${data.data.email} deleted`,
+          });
+        } catch (e) {
+          return res.status(400).json({
+            error: "Email does not exist",
+          });
+        }
+      }
+      return res.status(400).json({
+        error: "Invalid email",
       });
     default:
       return res.status(405).json({
