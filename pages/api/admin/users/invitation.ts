@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { Role } from "@/lib/schema";
+import { getToken } from "next-auth/jwt";
 
 const schema = z.object({
   email: z.string().email(),
@@ -15,8 +16,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const token = await getToken({ req });
   switch (req.method) {
     case "POST":
+      if (token?.role !== Role.enum.owner) {
+        return res.status(403).json({ error: "Only owner can add invitation" });
+      }
       try {
         const data = schema.parse(req.body);
 
@@ -61,6 +66,11 @@ export default async function handler(
         invitations,
       });
     case "PATCH":
+      if (token?.role !== Role.enum.owner) {
+        return res
+          .status(403)
+          .json({ error: "Only owner can delete invitation" });
+      }
       const data = deletedReq.safeParse(req.body);
       if (data.success) {
         try {

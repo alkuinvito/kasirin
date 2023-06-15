@@ -19,10 +19,12 @@ import { Toast } from "../shared/toast";
 
 export default function Invitation() {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("user");
+  const [role, setRole] = useState("employee");
   const [invitations, setInvitations] = useState(<></>);
+  const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const [openErr, setOpenErr] = useState(false);
 
   const handleDelete = async (email: string) => {
     var options = {
@@ -75,11 +77,24 @@ export default function Invitation() {
                 <TrashIcon
                   className="w-5 h-5 text-red-700"
                   onClick={() => {
-                    handleDelete(invitation.email).then(() => {
-                      getInvitations().then((res) => {
-                        setInvitations(renderInvitations(res));
+                    handleDelete(invitation.email)
+                      .then(() => {
+                        setSuccess("Invitation deleted successfully");
+                        setOpen(true);
+                        getInvitations().then((res) => {
+                          setInvitations(renderInvitations(res));
+                        });
+                      })
+                      .catch((err) => {
+                        const result = z
+                          .string()
+                          .safeParse(err.response.data.error);
+                        if (result.success) {
+                          setError(result.data);
+                          setOpenErr(true);
+                          setEmail("");
+                        }
                       });
-                    });
                   }}
                 />
               </button>
@@ -111,15 +126,19 @@ export default function Invitation() {
     axios
       .request(options)
       .then(() => {
+        setSuccess("Invitation added successfully");
+        setOpen(true);
         getInvitations().then((res) => {
           setInvitations(renderInvitations(res));
+          setEmail("");
         });
       })
       .catch((err) => {
         const result = z.string().safeParse(err.response.data.error);
         if (result.success) {
           setError(result.data);
-          setOpen(true);
+          setOpenErr(true);
+          setEmail("");
         }
       });
   };
@@ -128,8 +147,19 @@ export default function Invitation() {
     <ToastProvider swipeDirection="right">
       <Toast
         className="text-white bg-red-500 dark:bg-red-800"
-        title="Failed to create invitation"
+        title="Failed to update invitation"
         content={error}
+        open={openErr}
+        setOpen={setOpenErr}
+      >
+        <button onClick={() => setOpen(false)}>
+          <Cross1Icon />
+        </button>
+      </Toast>
+      <Toast
+        className="text-white bg-green-500 dark:bg-green-800"
+        title="Updated succesfully"
+        content={success}
         open={open}
         setOpen={setOpen}
       >
@@ -181,16 +211,24 @@ export default function Invitation() {
                     <ChevronUpIcon />
                   </Select.ScrollUpButton>
                   <Select.Viewport className={styles.SelectViewport}>
-                    <Select.Item className={styles.SelectItem} value="admin">
-                      <Select.ItemText>Admin</Select.ItemText>
+                    <Select.Item className={styles.SelectItem} value="owner">
+                      <Select.ItemText>Owner</Select.ItemText>
                       <Select.ItemIndicator
                         className={styles.SelectItemIndicator}
                       >
                         <CheckIcon />
                       </Select.ItemIndicator>
                     </Select.Item>
-                    <Select.Item className={styles.SelectItem} value="user">
-                      <Select.ItemText>User</Select.ItemText>
+                    <Select.Item className={styles.SelectItem} value="manager">
+                      <Select.ItemText>Manager</Select.ItemText>
+                      <Select.ItemIndicator
+                        className={styles.SelectItemIndicator}
+                      >
+                        <CheckIcon />
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                    <Select.Item className={styles.SelectItem} value="employee">
+                      <Select.ItemText>Employee</Select.ItemText>
                       <Select.ItemIndicator
                         className={styles.SelectItemIndicator}
                       >
