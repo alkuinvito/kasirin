@@ -2,46 +2,59 @@ import { UserModelSchema, UserModel } from "@/lib/schema";
 import axios from "axios";
 import { z } from "zod";
 import Invitation from "@/components/admin/invitation";
+import EditProfile from "@/components/admin/edit-profile";
 import { useEffect, useState } from "react";
 import { Pencil2Icon } from "@radix-ui/react-icons";
 
-const getUsers = async () => {
-  const { data } = await axios.get("/api/admin/users", {
-    withCredentials: true,
-  });
-  return z.array(UserModelSchema).parse(data.users);
-};
-
-const renderUsers = (users: UserModel[]): JSX.Element => {
-  return (
-    <table className="w-full text-left">
-      <tr className="border-y border-gray-300 dark:border-slate-700">
-        <th className="p-2">Name</th>
-        <th className="p-2">Email</th>
-        <th className="p-2">Role</th>
-        <th className="p-2"></th>
-      </tr>
-      {users.map((user) => (
-        <tr
-          key={user.id}
-          className="border-y border-gray-300 dark:border-slate-700"
-        >
-          <td className="p-2">{user.name}</td>
-          <td className="p-2">{user.email}</td>
-          <td className="p-2">{user.role}</td>
-          <td className="p-2">
-            <button className="block mx-auto cursor-pointer">
-              <Pencil2Icon className="w-5 h-5" />
-            </button>
-          </td>
-        </tr>
-      ))}
-    </table>
-  );
-};
-
 export default function Page() {
   const [users, setUsers] = useState(<></>);
+
+  const getUsers = async () => {
+    const { data } = await axios.get("/api/admin/users", {
+      withCredentials: true,
+    });
+    return z.array(UserModelSchema).parse(data.users);
+  };
+
+  const renderUsers = (users: UserModel[]): JSX.Element => {
+    return (
+      <table className="w-full text-left">
+        <tr className="border-y border-gray-300 dark:border-slate-700">
+          <th className="p-2">Name</th>
+          <th className="p-2">Email</th>
+          <th className="p-2">Role</th>
+          <th className="p-2"></th>
+        </tr>
+        {users.map((user) => (
+          <tr
+            key={user.id}
+            className="border-y border-gray-300 dark:border-slate-700"
+          >
+            <td className="p-2">{user.name}</td>
+            <td className="p-2">{user.email}</td>
+            <td className="p-2">{user.role}</td>
+            <td className="p-2">
+              <EditProfile
+                email={user.email}
+                fullname={user.name}
+                role={user.role}
+                trigger={
+                  <button className="block mx-auto cursor-pointer">
+                    <Pencil2Icon className="w-5 h-5" />
+                  </button>
+                }
+                onUpdate={() => {
+                  getUsers().then((res) => {
+                    setUsers(renderUsers(res));
+                  });
+                }}
+              />
+            </td>
+          </tr>
+        ))}
+      </table>
+    );
+  };
 
   useEffect(() => {
     getUsers().then((res) => {

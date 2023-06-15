@@ -31,9 +31,6 @@
 .SelectTrigger:hover {
   background-color: rgb(229 231 235);
 }
-.SelectTrigger:focus {
-  box-shadow: 0 0 0 2px black;
-}
 .SelectTrigger[data-placeholder] {
   color: #000000;
 }
