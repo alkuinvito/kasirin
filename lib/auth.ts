@@ -42,11 +42,11 @@ export const authOptions: NextAuthOptions = {
 
       const result = await prisma.user.count({
         where: {
-          role: "admin",
+          role: "owner",
         },
       });
       if (result === 0) {
-        user.role = Role.enum.admin;
+        user.role = Role.enum.owner;
         return true;
       }
 

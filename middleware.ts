@@ -7,7 +7,7 @@ export default withAuth(
       req.nextUrl.pathname.startsWith("/admin") ||
       req.nextUrl.pathname.startsWith("/api/admin")
     ) {
-      if (req.nextauth.token?.role !== "admin") {
+      if (req.nextauth.token?.role === "employee") {
         return NextResponse.rewrite(
           new URL("/auth/signin?error=AccessDenied", req.url)
         );
