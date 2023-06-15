@@ -8,11 +8,13 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Popover from "@radix-ui/react-popover";
 import { ExitIcon, PersonIcon } from "@radix-ui/react-icons";
 import { signOut } from "next-auth/react";
+import { Role } from "@/lib/schema";
+import Link from "next/link";
 
 export default function Header() {
   const { data: session } = useSession();
   return (
-    <div className="z-50 shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
+    <div className="z-30 shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
       <div className="wrapper max-w-7xl w-full h-full flex justify-between items-center mx-auto">
         <Hamburger />
         <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-semibold text-3xl">
@@ -41,10 +43,17 @@ export default function Header() {
           </NavigationMenu.List>
         </NavigationMenu.Root>
 
+        {session?.user?.role === Role.enum.owner ||
+        session?.user?.role === Role.enum.manager ? (
+          <Link
+            href="/admin"
+            className="rounded-lg px-2 py-1 mr-4 bg-gradient-to-tr from-indigo-500 to-pink-500 text-white dark:text-gray-300 font-semibold"
+          >
+            Admin
+          </Link>
+        ) : null}
+
         <Popover.Root>
-          <p className="hidden md:block px-5 text-sm font-mono whitespace-nowrap">
-            Rp 7.000.000
-          </p>
           <Popover.Trigger asChild>
             <button
               className="IconButton bg-gray-300 dark:bg-gray-900"
