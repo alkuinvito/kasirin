@@ -63,25 +63,24 @@ model Invitation {
 }
 
 model Category {
-  id String @id @default(cuid())
-  name String
+  id       String @id @default(cuid())
+  name     String
   products Product[]
 }
 
 model Product {
-  id    String @id @default(cuid())
-  name  String
-  price BigInt
-  image String
-  order Order?
-  categoryId String @unique
-  category Category @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
+  id         String @id @default(cuid())
+  name       String
+  price      Int
+  image      String
+  orders     Order[]
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
 }
 
 model Order {
   id            String @id @default(cuid())
-  productId     String @unique
-  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  products      Product[]
   transactionId String
   transaction   Transaction @relation(fields: [transactionId], references: [id])
   quantity      Int

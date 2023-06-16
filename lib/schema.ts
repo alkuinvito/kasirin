@@ -47,3 +47,36 @@ export const profileSchema = z.object({
     invalid_type_error: "Role must be owner, manager or employee",
   }),
 });
+
+export const productSchema = z.object({
+  id: z.string().cuid().optional(),
+  name: z
+    .string({
+      required_error: "Name must not be empty",
+      invalid_type_error: "Name must be a string",
+    })
+    .min(8, "Name must between 8 and 32 characters long")
+    .max(32, "Name must between 8 and 32 characters long"),
+  price: z
+    .number({
+      required_error: "Price must not be empty",
+      invalid_type_error: "Price must be an integer",
+    })
+    .positive("Price can not be negative value")
+    .safe(),
+  image: z
+    .string({
+      required_error: "Image must not be empty",
+    })
+    .url("Image must be a valid URL"),
+  categoryId: z
+    .string({
+      required_error: "Category must not be empty",
+    })
+    .cuid("Category must be a valid CUID"),
+});
+
+export const categorySchema = z.object({
+  id: z.string().cuid().optional(),
+  name: z.string().min(3).max(16),
+});
