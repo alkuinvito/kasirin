@@ -1,4 +1,4 @@
-import { Role, profileSchema } from "@/lib/schema";
+import { Role } from "@/lib/schema";
 import React, { ReactNode, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Select from "@radix-ui/react-select";
@@ -44,6 +44,8 @@ export default function EditProfile({
   const [openErr, setOpenErr] = useState(false);
   const [currentFullname, setFullname] = useState(fullname);
   const [currentRole, setRole] = useState(role.toString());
+
+  console.log(role.toString());
 
   const handleSubmit = async () => {
     setError("");
@@ -105,8 +107,8 @@ export default function EditProfile({
       <Dialog.Root>
         <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0 z-40" />
-          <Dialog.Content className="bg-white dark:bg-slate-950 rounded-lg p-5 shadow-sm fixed w-96 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+          <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
+          <Dialog.Content className="bg-white dark:bg-slate-950 rounded-lg p-5 shadow-sm fixed w-96 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Dialog.Title className="DialogTitle pb-3">
               Edit profile
             </Dialog.Title>
@@ -140,61 +142,17 @@ export default function EditProfile({
             <fieldset className="grid pt-2">
               <label htmlFor="role">Role</label>
               <FieldErrors errors={formErrors?.fieldErrors.role} />
-
-              <Select.Root value={currentRole} onValueChange={setRole}>
-                <Select.Trigger
-                  className={styles.SelectTrigger}
-                  aria-label="Role"
-                >
-                  <Select.Value className={styles.SelectValue} />
-                  <Select.Icon className={styles.SelectIcon}>
-                    <ChevronDownIcon />
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Content className={styles.SelectContent}>
-                    <Select.ScrollUpButton
-                      className={styles.SelectScrollUpButton}
-                    >
-                      <ChevronUpIcon />
-                    </Select.ScrollUpButton>
-                    <Select.Viewport className={styles.SelectViewport}>
-                      <Select.Item className={styles.SelectItem} value="owner">
-                        <Select.ItemText>Owner</Select.ItemText>
-                        <Select.ItemIndicator
-                          className={styles.SelectItemIndicator}
-                        >
-                          <CheckIcon />
-                        </Select.ItemIndicator>
-                      </Select.Item>
-                      <Select.Item
-                        className={styles.SelectItem}
-                        value="manager"
-                      >
-                        <Select.ItemText>Manager</Select.ItemText>
-                        <Select.ItemIndicator
-                          className={styles.SelectItemIndicator}
-                        >
-                          <CheckIcon />
-                        </Select.ItemIndicator>
-                      </Select.Item>
-                      <Select.Item
-                        className={styles.SelectItem}
-                        value="employee"
-                      >
-                        <Select.ItemText>Employee</Select.ItemText>
-                        <Select.ItemIndicator
-                          className={styles.SelectItemIndicator}
-                        >
-                          <CheckIcon />
-                        </Select.ItemIndicator>
-                      </Select.Item>
-                    </Select.Viewport>
-                    <Select.ScrollDownButton />
-                    <Select.Arrow />
-                  </Select.Content>
-                </Select.Portal>
-              </Select.Root>
+              <select
+                name="role"
+                id="role"
+                className="bg-gray-100 dark:bg-slate-900 rounded-lg p-2 block hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800 appearance-none"
+                value={currentRole}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                <option value="owner">Owner</option>
+                <option value="manager">Manager</option>
+                <option value="employee">Employee</option>
+              </select>
             </fieldset>
             <div className="flex justify-between pt-5">
               <Dialog.Close asChild>
