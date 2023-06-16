@@ -62,12 +62,20 @@ model Invitation {
   role  String
 }
 
+model Category {
+  id String @id @default(cuid())
+  name String
+  products Product[]
+}
+
 model Product {
   id    String @id @default(cuid())
   name  String
   price BigInt
-  image String?
+  image String
   order Order?
+  categoryId String @unique
+  category Category @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
 }
 
 model Order {
