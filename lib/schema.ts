@@ -80,3 +80,13 @@ export const categorySchema = z.object({
   id: z.string().cuid().optional(),
   name: z.string().min(3).max(16),
 });
+
+export const menuSchema = z.object({
+  categories: z
+    .object({
+      id: z.string().cuid(),
+      name: z.string(),
+      products: productSchema.array(),
+    })
+    .array(),
+});

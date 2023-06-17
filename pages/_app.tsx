@@ -5,7 +5,6 @@ import { SessionProvider } from "next-auth/react";
 
 import "@/styles/globals.css";
 import "@/styles/header.css";
-import "@/styles/menuList.css";
 
 function MyApp({
   Component,

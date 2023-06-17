@@ -1,32 +1,24 @@
 import Image from "next/image";
-
-export interface Menu {
-  image: string;
-  name: string;
-  price: number;
-}
+import z from "zod";
+import { productSchema } from "@/lib/schema";
 
 export default function MenuItem({
-  image,
-  name,
-  price,
+  product,
 }: {
-  image: string;
-  name: string;
-  price: number;
+  product: z.infer<typeof productSchema>;
 }) {
   return (
-    <div className="flex flex-col rounded-lg cursor-pointer">
+    <div className="flex flex-col rounded-lg" key={product.id}>
       <Image
         className="w-full rounded-lg"
-        src={image}
-        alt={name}
+        src={product.image}
+        alt={product.name}
         width={100}
         height={100}
       ></Image>
       <div className="grid pt-2">
-        <span className="font-semibold">{name}</span>
-        <span className="text-sm">{price}</span>
+        <span className="font-semibold">{product.name}</span>
+        <span className="text-sm">{product.price}</span>
       </div>
     </div>
   );

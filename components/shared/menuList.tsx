@@ -1,69 +1,40 @@
-"use client";
-
-import React from "react";
-import * as Accordion from "@radix-ui/react-accordion";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import MenuItem, { Menu } from "./menuItem";
-
-export interface Menus {
-  name: string;
-  menu: Menu[];
-}
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import MenuItem from "./menuItem";
+import { menuSchema } from "@/lib/schema";
+import styles from "@/styles/menus.module.css";
 
 export default function MenuList() {
-  let menus: Menus[] = [
-    {
-      name: "drinks",
-      menu: [
-        {
-          image:
-            "http://3.bp.blogspot.com/-US1FOxNnpr0/U4f3MBtDJLI/AAAAAAAARK0/aSSJTb1oUcY/s1600/Congyang_cap_tiga_orang.jpg",
-          name: "Congyang",
-          price: 65000,
-        },
-      ],
-    },
-    {
-      name: "snacks",
-      menu: [
-        {
-          image:
-            "http://3.bp.blogspot.com/-iXlsFO9wIZc/Uu_BWwA4PgI/AAAAAAAADTg/8Dl3pbiTaAk/s1600/fries.jpg",
-          name: "Kentang",
-          price: 80000,
-        },
-      ],
-    },
-  ];
+  const [menus, setMenus] = useState(menuSchema.partial().parse({}));
+
+  useEffect(() => {
+    axios
+      .get("/api/products", { withCredentials: true })
+      .then((res) => {
+        const data = menuSchema.safeParse(res.data);
+        if (data.success) {
+          setMenus(data.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
   return (
-    <Accordion.Root
-      className="AccordionRoot grow px-3"
-      type="multiple"
-      defaultValue={menus.map((category) => category.name)}
-    >
-      {menus.map((category) => (
-        <Accordion.Item
-          className="AccordionItem"
-          value={category.name}
-          key={category.name}
-        >
-          <Accordion.Trigger className="AccordionTrigger px-4 py-2 mb-6 w-full box-border rounded-lg bg-gray-100 dark:bg-slate-800 flex items-center">
-            <h2 className="grow text-xl font-semibold">{category.name}</h2>
-            <ChevronDownIcon className="AccordionChevron" aria-hidden />
-          </Accordion.Trigger>
-          <Accordion.Content className="AccordionContent">
-            {category.menu.map((item) => (
-              <MenuItem
-                key={item.name}
-                image={item.image}
-                name={item.name}
-                price={item.price}
-              ></MenuItem>
+    <ul>
+      {menus?.categories?.map((category) => (
+        <li key={category.id} id={category.id} className="mb-4">
+          <h1 className="my-2 text-xl font-semibold">{category.name}</h1>
+          <div className={styles.MenuList}>
+            {category.products.map((item) => (
+              <>
+                <MenuItem product={item}></MenuItem>
+              </>
             ))}
-          </Accordion.Content>
-        </Accordion.Item>
+          </div>
+        </li>
       ))}
-    </Accordion.Root>
+    </ul>
   );
 }
