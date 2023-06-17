@@ -5,16 +5,19 @@ import { SessionProvider } from "next-auth/react";
 
 import "@/styles/globals.css";
 import "@/styles/header.css";
+import { useState } from "react";
 
 function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppProps<{ session: Session }>) {
+  const [menuQuery, setMenuQuery] = useState("");
+
   return (
     <SessionProvider session={session}>
-      <Header />
+      <Header onQuery={setMenuQuery} />
       <main className="mt-20 max-w-7xl mx-auto">
-        <Component {...pageProps} />
+        <Component query={menuQuery} {...pageProps} />
       </main>
     </SessionProvider>
   );
