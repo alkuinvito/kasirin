@@ -11,6 +11,8 @@ import { signOut } from "next-auth/react";
 import { Role } from "@/lib/schema";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function AdminBadge(props: { session: Session }) {
   if (
@@ -101,9 +103,15 @@ function AdminNav(props: { pathname: String }) {
   return null;
 }
 
-export default function Header() {
+export default function Header(props: {
+  onQuery: React.Dispatch<React.SetStateAction<string>>;
+}) {
   const { data: session } = useSession();
   const router = useRouter();
+
+  const handleInput = (q: string) => {
+    props.onQuery(q);
+  };
 
   return (
     <div className="z-30 shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
@@ -114,6 +122,25 @@ export default function Header() {
             KasirIn
           </h1>
         </Link>
+
+        {router.pathname === "/" ? (
+          <div className="ml-8 p-2 flex items-center w-72 bg-gray-100 dark:bg-slate-900 hover:bg-gray-200 hover:dark:bg-slate-800 focus-within:bg-gray-200 focus-within:dark:bg-slate-800 rounded-lg">
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="mr-2 text-gray-300 dark:text-slate-600"
+            />
+            <input
+              type="text"
+              name="q"
+              placeholder="Search products..."
+              className="bg-transparent focus:outline-none w-full"
+              autoComplete="off"
+              onInput={(e) => {
+                handleInput((e.target as HTMLInputElement).value);
+              }}
+            />
+          </div>
+        ) : null}
 
         {session?.user ? (
           <>

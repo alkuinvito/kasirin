@@ -3,14 +3,36 @@ import { prisma } from "@/lib/db";
 import { Role, productSchema } from "@/lib/schema";
 import { Prisma } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
+import z from "zod";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const token = await getToken({ req });
+
   switch (req.method) {
     case "GET":
+      const { q } = req.query;
+      const query = z.string().safeParse(q);
+      if (query.success) {
+        const categories = await prisma.category.findMany({
+          where: {
+            products: {
+              some: {
+                name: {
+                  contains: query.data,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+          include: {
+            products: true,
+          },
+        });
+        return res.status(200).json({ categories });
+      }
       const categories = await prisma.category.findMany({
         include: {
           products: true,

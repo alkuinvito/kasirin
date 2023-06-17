@@ -81,6 +81,8 @@ export const categorySchema = z.object({
   name: z.string().min(3).max(16),
 });
 
+export type Category = z.infer<typeof categorySchema>;
+
 export const menuSchema = z.object({
   categories: z
     .object({
