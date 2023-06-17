@@ -2,15 +2,15 @@
 
 import React from "react";
 import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
 import Image from "next/image";
 import Hamburger from "./hamburger";
-import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Popover from "@radix-ui/react-popover";
 import { ExitIcon, PersonIcon } from "@radix-ui/react-icons";
 import { signOut } from "next-auth/react";
 import { Role } from "@/lib/schema";
 import Link from "next/link";
-import { Session } from "next-auth";
+import { useRouter } from "next/router";
 
 function AdminBadge(props: { session: Session }) {
   if (
@@ -29,25 +29,97 @@ function AdminBadge(props: { session: Session }) {
   return null;
 }
 
+function HomeNav(props: { pathname: String }) {
+  if (props.pathname === "/") {
+    return (
+      <>
+        <Link
+          href="/"
+          className="text-indigo-700 transition-colors font-semibold"
+        >
+          Dashboard
+        </Link>
+        <Link
+          href="/transaction"
+          className="hover:text-indigo-700 transition-colors"
+        >
+          Transaction
+        </Link>
+      </>
+    );
+  } else if (props.pathname === "/transaction") {
+    return (
+      <>
+        <Link href="/" className="hover:text-indigo-700 transition-colors">
+          Dashboard
+        </Link>
+        <Link
+          href="/transaction"
+          className="text-indigo-700 transition-colors font-semibold"
+        >
+          Transaction
+        </Link>
+      </>
+    );
+  }
+  return null;
+}
+
+function AdminNav(props: { pathname: String }) {
+  if (props.pathname === "/admin") {
+    return (
+      <>
+        <Link
+          href="/admin"
+          className="text-indigo-700 transition-colors font-semibold"
+        >
+          User Management
+        </Link>
+        <Link
+          href="/admin/products"
+          className="hover:text-indigo-700 transition-colors"
+        >
+          Products
+        </Link>
+      </>
+    );
+  } else if (props.pathname === "/admin/products") {
+    return (
+      <>
+        <Link href="/admin" className="hover:text-indigo-700 transition-colors">
+          User Management
+        </Link>
+        <Link
+          href="/admin/products"
+          className="text-indigo-700 transition-colors font-semibold"
+        >
+          Products
+        </Link>
+      </>
+    );
+  }
+  return null;
+}
+
 export default function Header() {
   const { data: session } = useSession();
+  const router = useRouter();
+
   return (
     <div className="z-30 shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
       <div className="wrapper max-w-7xl w-full h-full flex justify-between items-center mx-auto">
         <Hamburger />
-        <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-bold text-3xl">
-          KasirIn
-        </h1>
+        <Link href="/">
+          <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-bold text-3xl">
+            KasirIn
+          </h1>
+        </Link>
 
         {session?.user ? (
           <>
-            <nav className="flex gap-4 grow items-start justify-end mr-4">
-              <Link href="/" className="hover:text-indigo-700">
-                Dashboard
-              </Link>
-              <Link href="/transaction" className="hover:text-indigo-700">
-                Transaction
-              </Link>
+            <nav className="hidden md:flex lg:flex grow gap-4 items-start justify-end mr-4">
+              <HomeNav pathname={router.pathname} />
+              <AdminNav pathname={router.pathname} />
             </nav>
 
             <AdminBadge session={session} />
