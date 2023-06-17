@@ -1,14 +1,7 @@
 import { Role } from "@/lib/schema";
 import React, { ReactNode, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import * as Select from "@radix-ui/react-select";
-import styles from "@/styles/select.module.css";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  Cross1Icon,
-} from "@radix-ui/react-icons";
+import { Cross1Icon } from "@radix-ui/react-icons";
 import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
 import { Toast } from "../shared/toast";
 import axios from "axios";
