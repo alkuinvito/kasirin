@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import Image from "next/image";
@@ -108,6 +108,7 @@ export default function Header(props: {
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const [inputs, setInputs] = useState("");
 
   const handleInput = (q: string) => {
     props.onQuery(q);
@@ -129,16 +130,24 @@ export default function Header(props: {
               icon={faMagnifyingGlass}
               className="mr-2 text-gray-300 dark:text-slate-600"
             />
-            <input
-              type="text"
-              name="q"
-              placeholder="Search products..."
-              className="bg-transparent focus:outline-none w-full"
-              autoComplete="off"
-              onInput={(e) => {
-                handleInput((e.target as HTMLInputElement).value);
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                props.onQuery(inputs);
               }}
-            />
+            >
+              <input
+                type="text"
+                name="q"
+                placeholder="Search products..."
+                className="bg-transparent focus:outline-none w-full"
+                autoComplete="off"
+                value={inputs}
+                onInput={(e) => {
+                  setInputs((e.target as HTMLInputElement).value);
+                }}
+              />
+            </form>
           </div>
         ) : null}
 
