@@ -77,7 +77,7 @@ export const productSchema = z.object({
 });
 
 export const categorySchema = z.object({
-  id: z.string().cuid().optional(),
+  id: z.string().cuid(),
   name: z.string().min(3).max(16),
 });
 
