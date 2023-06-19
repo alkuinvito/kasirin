@@ -11,7 +11,7 @@ import { signOut } from "next-auth/react";
 import { Role } from "@/lib/schema";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function AdminBadge(props: { session: Session }) {
@@ -110,10 +110,6 @@ export default function Header(props: {
   const router = useRouter();
   const [inputs, setInputs] = useState("");
 
-  const handleInput = (q: string) => {
-    props.onQuery(q);
-  };
-
   return (
     <div className="z-30 shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
       <div className="wrapper max-w-7xl w-full h-full flex justify-between items-center mx-auto">
@@ -131,6 +127,7 @@ export default function Header(props: {
               className="mr-2 text-gray-300 dark:text-slate-600"
             />
             <form
+              className="w-full"
               onSubmit={(e) => {
                 e.preventDefault();
                 props.onQuery(inputs);
@@ -148,6 +145,16 @@ export default function Header(props: {
                 }}
               />
             </form>
+            {inputs !== "" ? (
+              <button
+                onClick={() => {
+                  setInputs("");
+                  props.onQuery("");
+                }}
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            ) : null}
           </div>
         ) : null}
 
