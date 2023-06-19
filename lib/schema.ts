@@ -92,3 +92,10 @@ export const menuSchema = z.object({
     })
     .array(),
 });
+
+export const MenuPropsSchema = z.object({
+  products: menuSchema,
+  query: z.string(),
+});
+
+export type MenuProps = z.infer<typeof MenuPropsSchema>;
