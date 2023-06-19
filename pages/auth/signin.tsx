@@ -2,13 +2,15 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from "next";
-import { getProviders, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
-export default function SignIn({
-  providers,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function SignIn({}: InferGetServerSidePropsType<
+  typeof getServerSideProps
+>) {
   return (
     <div className="flex h-96 items-center">
       <div className="bg-white shadow-2xl w-72 h-72 rounded-lg mx-auto flex flex-col dark:bg-slate-900">
@@ -19,16 +21,15 @@ export default function SignIn({
           Make your business easier with Kasirin
         </p>
         <div className="p-4 rounded-lg text-center mt-10">
-          {Object.values(providers).map((provider) => (
-            <div key={provider.name}>
-              <button
-                onClick={() => signIn(provider.id)}
-                className="py-2 px-5 w-fit box-border rounded-md text-center text-white bg-blue-600 hover:bg-blue-800 font-semibold cursor-pointer shadow-lg"
-              >
-                Sign in with {provider.name}
-              </button>
-            </div>
-          ))}
+          <div>
+            <button
+              onClick={() => signIn("google")}
+              className="py-2 px-5 w-fit box-border rounded-md text-center text-white bg-blue-600 hover:bg-blue-800 font-semibold cursor-pointer shadow-lg"
+            >
+              <FontAwesomeIcon icon={faGoogle} className="mr-2" />
+              Sign in with Google
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -38,17 +39,18 @@ export default function SignIn({
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
 
-  const { redirectUrl } = context.query;
+  const { callbackUrl } = context.query;
 
   if (session) {
     return {
-      redirect: { destination: redirectUrl === "/admin" ? "/admin" : "/" },
+      redirect: {
+        permanent: false,
+        destination: callbackUrl?.includes("/admin") ? "/admin" : "/",
+      },
     };
   }
 
-  const providers = await getProviders();
-
   return {
-    props: { providers: providers ?? [] },
+    props: {},
   };
 }
