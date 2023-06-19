@@ -121,10 +121,10 @@ export default function Header(props: {
         </Link>
 
         {router.pathname === "/" ? (
-          <div className="ml-8 p-2 flex items-center w-72 bg-gray-100 dark:bg-slate-900 hover:bg-gray-200 hover:dark:bg-slate-800 focus-within:bg-gray-200 focus-within:dark:bg-slate-800 rounded-lg">
+          <div className="ml-8 p-2 flex items-center w-72 backdrop-blur-md bg-gray-100/50 dark:bg-gray-600/50 hover:bg-gray-200/50 hover:dark:bg-slate-800/50 focus-within:bg-gray-200/50 focus-within:dark:bg-slate-800/50 rounded-lg">
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
-              className="mr-2 text-gray-300 dark:text-slate-600"
+              className="mr-2 text-gray-300 dark:text-gray-500"
             />
             <form
               className="w-full"
