@@ -48,6 +48,12 @@ export const profileSchema = z.object({
   }),
 });
 
+export const variantSchema = z.object({
+  id: z.string().cuid().optional(),
+  name: z.string(),
+  price: z.number().int().gte(0),
+});
+
 export const productSchema = z.object({
   id: z.string().cuid().optional(),
   name: z
@@ -55,8 +61,8 @@ export const productSchema = z.object({
       required_error: "Name must not be empty",
       invalid_type_error: "Name must be a string",
     })
-    .min(8, "Name must between 8 and 32 characters long")
-    .max(32, "Name must between 8 and 32 characters long"),
+    .min(3, "Name must between 3 and 16 characters long")
+    .max(32, "Name must between 3 and 16 characters long"),
   price: z
     .number({
       required_error: "Price must not be empty",
@@ -69,6 +75,7 @@ export const productSchema = z.object({
       required_error: "Image must not be empty",
     })
     .url("Image must be a valid URL"),
+  variants: variantSchema.array().optional(),
   categoryId: z
     .string({
       required_error: "Category must not be empty",

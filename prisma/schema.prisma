@@ -1,29 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL")
+  directUrl         = env("POSTGRES_URL_NON_POOLING")
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-generator client {
-  provider        = "prisma-client-js"
-}
-
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -37,9 +36,9 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?       @unique
   emailVerified DateTime?
   image         String?
   role          String?
@@ -63,33 +62,41 @@ model Invitation {
 }
 
 model Category {
-  id       String @id @default(cuid())
+  id       String    @id @default(cuid())
   name     String
   products Product[]
 }
 
+model Variant {
+  id       String    @id @default(cuid())
+  name     String
+  price    Int       @default(0)
+  products Product[] @relation("ProductToVariant")
+}
+
 model Product {
-  id         String @id @default(cuid())
+  id         String    @id @default(cuid())
   name       String
   price      Int
   image      String
-  orders     Order[]
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
+  category   Category  @relation(fields: [categoryId], references: [id])
+  orders     Order[]   @relation("OrderToProduct")
+  variants   Variant[] @relation("ProductToVariant")
 }
 
 model Order {
-  id            String @id @default(cuid())
-  products      Product[]
+  id            String      @id @default(cuid())
   transactionId String
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
   quantity      Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  products      Product[]   @relation("OrderToProduct")
 }
 
 model Transaction {
-  id     String @id @default(cuid())
+  id     String   @id @default(cuid())
   userId String
   date   DateTime @default(now())
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

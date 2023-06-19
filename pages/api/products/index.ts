@@ -28,7 +28,14 @@ export default async function handler(
             },
           },
           include: {
-            products: true,
+            products: {
+              where: {
+                name: {
+                  contains: query.data,
+                  mode: "insensitive",
+                },
+              },
+            },
           },
         });
         return res.status(200).json({ categories });
@@ -58,6 +65,9 @@ export default async function handler(
               name: data.data.name,
               price: data.data.price,
               image: data.data.image,
+              variants: {
+                create: data.data.variants,
+              },
               categoryId: data.data.categoryId,
             },
           });
