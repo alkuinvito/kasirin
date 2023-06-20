@@ -36,9 +36,7 @@ export default function Home({ products, query }: MenuProps) {
               <h1 className="my-2 text-xl font-semibold">{category.name}</h1>
               <div className={styles.MenuList}>
                 {category.products.map((item) => (
-                  <>
-                    <MenuItem key={item.id} product={item}></MenuItem>
-                  </>
+                  <MenuItem key={item.id} product={item}></MenuItem>
                 ))}
               </div>
             </li>
@@ -49,6 +47,7 @@ export default function Home({ products, query }: MenuProps) {
         <div>
           {products.categories.map((category) => (
             <a
+              key={toSnakeCase(category.name)}
               className="rounded-lg px-2 py-1 mr-4 border-solid border border-indigo-700 text-indigo-700 hover:bg-indigo-700 hover:text-white transition-colors "
               href={`#${toSnakeCase(category.name)}`}
             >

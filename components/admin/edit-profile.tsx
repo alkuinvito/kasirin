@@ -38,8 +38,6 @@ export default function EditProfile({
   const [currentFullname, setFullname] = useState(fullname);
   const [currentRole, setRole] = useState(role.toString());
 
-  console.log(role.toString());
-
   const handleSubmit = async () => {
     setError("");
     setFormErrors(defaultErrors);
