@@ -3,11 +3,11 @@ import SideBar from "./sidebar";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <main className=" max-w-[1280px] mx-auto min-w-full">
-      <div className="flex justify-center">
-        <SideBar />
-        <section className="w-full">{children}</section>
-      </div>
+    <main className="flex justify-center">
+      <SideBar />
+      <section className="grow">
+        <div className="max-w-[1520px] mx-auto mt-10">{children}</div>
+      </section>
     </main>
   );
 }
