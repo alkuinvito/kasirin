@@ -5,7 +5,7 @@ import axios from "axios";
 import { z } from "zod";
 import EditProfile from "./edit-profile";
 import Image from "next/image";
-import { coloredRole } from "@/lib/helper";
+import ColoredRole from "@/components/shared/ColoredRole";
 
 export default function UserList() {
   const getUsers = async () => {
@@ -84,7 +84,9 @@ export default function UserList() {
           </td>
           <td className="p-2">{user.name}</td>
           <td className="p-2">{user.email}</td>
-          <td className="p-2">{coloredRole(user.role)}</td>
+          <td className="p-2">
+            <ColoredRole role={user.role} />
+          </td>
           <td className="p-2">
             <EditProfile
               email={user.email}

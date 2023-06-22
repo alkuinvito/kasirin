@@ -1,13 +1,6 @@
-import { Role } from "./schema";
+import { Role } from "@/lib/schema";
 
-export function toSnakeCase(str: string): string {
-  if (str) {
-    return str.toLowerCase().split(" ").join("-");
-  }
-  return "";
-}
-
-export function coloredRole(role: Role): JSX.Element {
+export default function ColoredRole({ role }: { role: Role }) {
   switch (role) {
     case Role.Enum.owner:
       return (

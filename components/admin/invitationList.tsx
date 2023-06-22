@@ -4,7 +4,7 @@ import { TrashIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { z } from "zod";
-import { coloredRole } from "@/lib/helper";
+import ColoredRole from "@/components/shared/ColoredRole";
 
 const InvitationList = forwardRef(function InvitationList(
   props: { onDelete: Function },
@@ -81,7 +81,9 @@ const InvitationList = forwardRef(function InvitationList(
             className="border-y border-gray-300 dark:border-slate-700"
           >
             <td className="p-2">{invitation.email}</td>
-            <td className="p-2">{coloredRole(invitation.role)}</td>
+            <td className="p-2">
+              <ColoredRole role={invitation.role} />
+            </td>
             <td className="p-2">
               <button className="block mx-auto cursor-pointer">
                 <TrashIcon
