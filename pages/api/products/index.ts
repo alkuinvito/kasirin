@@ -16,37 +16,19 @@ export default async function handler(
       const { q } = req.query;
       const query = z.string().safeParse(q);
       if (query.success) {
-        const categories = await prisma.category.findMany({
+        const products = await prisma.product.findMany({
           where: {
-            products: {
-              some: {
-                name: {
-                  contains: query.data,
-                  mode: "insensitive",
-                },
-              },
-            },
-          },
-          include: {
-            products: {
-              where: {
-                name: {
-                  contains: query.data,
-                  mode: "insensitive",
-                },
-              },
+            name: {
+              contains: query.data,
+              mode: "insensitive",
             },
           },
         });
-        return res.status(200).json({ categories });
+        return res.status(200).json({ products });
       }
-      const categories = await prisma.category.findMany({
-        include: {
-          products: true,
-        },
-      });
+      const products = await prisma.product.findMany();
       return res.status(200).json({
-        categories,
+        products,
       });
     case "POST":
       if (

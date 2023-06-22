@@ -6,28 +6,18 @@ import { Toast } from "../shared/toast";
 import axios from "axios";
 import z from "zod";
 import FieldErrors from "../shared/fieldErrors";
-import { productSchema } from "@/lib/schema";
-import Image from "next/image";
-import * as Switch from "@radix-ui/react-switch";
 
-export default function EditProduct({
-  product,
+export default function AddCategory({
   onUpdate,
   trigger,
 }: {
-  product: z.infer<typeof productSchema>;
   onUpdate: Function;
   trigger: ReactNode;
 }) {
   const defaultErrors = {
     formErrors: [],
     fieldErrors: {
-      id: [],
-      image: [],
       name: [],
-      price: [],
-      categoryId: [],
-      variants: [],
     },
   };
 
@@ -36,32 +26,26 @@ export default function EditProduct({
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [openErr, setOpenErr] = useState(false);
-  const [image, setImage] = useState(product.image);
-  const [currentName, setName] = useState(product.name);
-  const [currentPrice, setPrice] = useState(product.price);
-  const [available, setAvailable] = useState(product.available);
+  const [currentName, setName] = useState("");
 
-  const handleSubmit = async (id: string) => {
+  const handleSubmit = async () => {
     setError("");
     setFormErrors(defaultErrors);
 
     const options = {
       method: "POST",
-      url: `/api/products/${id}`,
+      url: `/api/categories`,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       data: {
-        image: image,
         name: currentName,
-        price: currentPrice,
-        available: available,
       },
     };
     axios
       .request(options)
       .then(() => {
-        setSuccess("Product updated successfully");
+        setSuccess("Category added successfully");
         setOpen(true);
         onUpdate();
       })
@@ -108,26 +92,13 @@ export default function EditProduct({
         <Dialog.Portal>
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
           <Dialog.Content className="bg-white dark:bg-slate-950 rounded-lg p-5 shadow-sm fixed w-[512px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Dialog.Title className="DialogTitle pb-3 font-semibold text-lg">
-              Edit Product
+            <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
+              Create Category
             </Dialog.Title>
             <Dialog.Description className="DialogDescription">
-              Make changes to your product here. Click save when you&apos;re
-              done.
+              Create new category product here
             </Dialog.Description>
             <div className="flex justify-between gap-4 items-center">
-              <section>
-                <fieldset className="grid pt-2">
-                  <FieldErrors errors={formErrors?.fieldErrors.image} />
-                  <Image
-                    className="w-full rounded-lg"
-                    src={product.image}
-                    alt={product.name}
-                    width={136}
-                    height={136}
-                  ></Image>
-                </fieldset>
-              </section>
               <section className="grow">
                 <fieldset className="grid pt-2">
                   <label htmlFor="name">Name</label>
@@ -142,48 +113,14 @@ export default function EditProduct({
                     autoComplete={"off"}
                   />
                 </fieldset>
-                <fieldset className="grid pt-2">
-                  <label htmlFor="price">Price</label>
-                  <FieldErrors errors={formErrors?.fieldErrors.price} />
-                  <input
-                    className="w-full py-2 px-3 bg-gray-100 dark:bg-slate-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800"
-                    id="price"
-                    defaultValue={currentPrice}
-                  />
-                </fieldset>
-                <fieldset className="grid pt-2">
-                  <FieldErrors errors={formErrors?.fieldErrors.price} />
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <label htmlFor="available" style={{ paddingRight: 15 }}>
-                      Available
-                    </label>
-                    <Switch.Root
-                      className="SwitchRoot"
-                      id="available"
-                      value={available ? "on" : "off"}
-                      onChange={(e) => {
-                        setAvailable(
-                          (e.target as HTMLInputElement).value === "on"
-                        );
-                      }}
-                    >
-                      <Switch.Thumb className="SwitchThumb" />
-                    </Switch.Root>
-                  </div>
-                </fieldset>
               </section>
             </div>
             <div className="flex justify-between pt-5">
-              <Dialog.Close asChild>
-                <button className="p-2 text-red-600 rounded-lg cursor-pointer">
-                  Delete Product
-                </button>
-              </Dialog.Close>
               <button
                 onClick={() => {}}
                 className=" py-2 px-3 bg-green-600 hover:bg-green-800 rounded-lg text-white font-medium cursor-pointer"
               >
-                Save changes
+                Add category
               </button>
             </div>
           </Dialog.Content>

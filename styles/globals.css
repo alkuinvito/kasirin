@@ -13,6 +13,10 @@
     background-color: #020617;
     color: #cacaca;
   }
+
+  .SwitchRoot {
+    background-color: rgb(30 41 59) !important;
+  }
 }
 
 html,
@@ -28,4 +32,36 @@ select:not([size]) {
   padding-right: 2.5rem;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
+}
+button {
+  all: unset;
+}
+
+.SwitchRoot {
+  width: 42px;
+  height: 25px;
+  background-color: var(--blackA9);
+  border-radius: 9999px;
+  position: relative;
+  box-shadow: 0 2px 10px var(--blackA7);
+  background-color: rgb(224, 224, 224);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.SwitchRoot[data-state="checked"] {
+  background-color: #2db32d !important;
+}
+
+.SwitchThumb {
+  display: block;
+  width: 21px;
+  height: 21px;
+  background-color: white;
+  border-radius: 9999px;
+  box-shadow: 0 2px 2px var(--blackA7);
+  transition: transform 100ms;
+  transform: translateX(2px);
+  will-change: transform;
+}
+.SwitchThumb[data-state="checked"] {
+  transform: translateX(19px);
 }

@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
 
 export const Role = z.enum(["owner", "manager", "employee"]);
@@ -81,6 +82,7 @@ export const productSchema = z.object({
       required_error: "Category must not be empty",
     })
     .cuid("Category must be a valid CUID"),
+  available: z.boolean().default(true),
 });
 
 export const categorySchema = z.object({
@@ -99,10 +101,3 @@ export const menuSchema = z.object({
     })
     .array(),
 });
-
-export const MenuPropsSchema = z.object({
-  products: menuSchema,
-  query: z.string(),
-});
-
-export type MenuProps = z.infer<typeof MenuPropsSchema>;

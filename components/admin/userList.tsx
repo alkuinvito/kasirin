@@ -1,9 +1,11 @@
 import { UserModelSchema } from "@/lib/schema";
-import { Pencil2Icon } from "@radix-ui/react-icons";
+import { Pencil2Icon, PersonIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { z } from "zod";
 import EditProfile from "./edit-profile";
+import Image from "next/image";
+import { coloredRole } from "@/lib/helper";
 
 export default function UserList() {
   const getUsers = async () => {
@@ -56,6 +58,7 @@ export default function UserList() {
   return (
     <table className="w-full text-left">
       <tr className="border-y border-gray-300 dark:border-slate-700">
+        <th className="p-2">Image</th>
         <th className="p-2">Name</th>
         <th className="p-2">Email</th>
         <th className="p-2">Role</th>
@@ -66,9 +69,22 @@ export default function UserList() {
           key={user.id}
           className="border-y border-gray-300 dark:border-slate-700"
         >
+          <td className="p-2">
+            {user?.image ? (
+              <Image
+                className="rounded-lg"
+                src={user?.image}
+                alt={user.name}
+                width={44}
+                height={44}
+              />
+            ) : (
+              <PersonIcon />
+            )}
+          </td>
           <td className="p-2">{user.name}</td>
           <td className="p-2">{user.email}</td>
-          <td className="p-2">{user.role}</td>
+          <td className="p-2">{coloredRole(user.role)}</td>
           <td className="p-2">
             <EditProfile
               email={user.email}
