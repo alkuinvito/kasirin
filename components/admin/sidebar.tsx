@@ -1,82 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { faUser, faBoxesStacked } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUser,
+  faBoxesStacked,
+  faRightFromBracket,
+  faArrowRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
+import { PersonIcon } from "@radix-ui/react-icons";
+import Image from "next/image";
+import NavItem from "./navItem";
+import { signOut } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function SideBar() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [inputs, setInputs] = useState("");
-
-  function AdminNav(props: { pathname: string; className?: string }) {
-    if (props.pathname === "/admin") {
-      return (
-        <nav className={props.className}>
-          <Link
-            href="/admin"
-            className="text-indigo-700 transition-colors font-semibold flex items-center gap-2"
-          >
-            <div className="flex justify-center w-6">
-              <FontAwesomeIcon icon={faUser} className="text-xl" />
-            </div>
-            <span>User Management</span>
-          </Link>
-          <Link
-            href="/admin/products"
-            className="hover:text-indigo-700 transition-colors flex items-center gap-2"
-          >
-            <div className="flex justify-center w-6">
-              <FontAwesomeIcon icon={faBoxesStacked} className="text-xl" />
-            </div>
-            Products
-          </Link>
-        </nav>
-      );
-    } else if (props.pathname === "/admin/products") {
-      return (
-        <nav className={props.className}>
-          <Link
-            href="/admin"
-            className="hover:text-indigo-700 transition-colors flex items-center gap-2"
-          >
-            <div className="flex justify-center w-6">
-              <FontAwesomeIcon icon={faUser} className="text-xl" />
-            </div>
-            <span>User Management</span>
-          </Link>
-          <Link
-            href="/admin/products"
-            className="text-indigo-700 transition-colors font-semibold flex items-center gap-2"
-          >
-            <div className="flex justify-center w-6">
-              <FontAwesomeIcon icon={faBoxesStacked} className="text-xl" />
-            </div>
-            Products
-          </Link>
-        </nav>
-      );
-    }
-    return null;
-  }
 
   return (
-    <aside className="flex flex-col w-96 h-screen p-4 bg-indigo-900">
-      <div>
+    <aside className="flex flex-col w-80 h-screen px-4 border-r border-gray-200 dark:border-gray-800">
+      <section className="py-8">
         <Link href="/">
-          <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-bold text-3xl">
+          <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-bold text-4xl text-center">
             KasirIn
           </h1>
         </Link>
-        <h2 className="text-lg">Admin</h2>
-        <AdminNav
-          className="flex flex-col pt-10 text-xl"
-          pathname={router.pathname}
-        />
-      </div>
+      </section>
+      <section className="grow">
+        <nav className="flex flex-col gap-3">
+          <NavItem
+            icon={faUser}
+            title="User Management"
+            href="/admin"
+            active={router.pathname === "/admin"}
+          />
+          <NavItem
+            icon={faBoxesStacked}
+            title="Products"
+            href="/admin/products"
+            active={router.pathname === "/admin/products"}
+          />
+        </nav>
+      </section>
+      <section className="py-6 flex gap-4 items-center">
+        {session?.user?.image ? (
+          <Image
+            src={session?.user?.image}
+            width={36}
+            height={36}
+            alt="user profile"
+            className="rounded-full"
+          ></Image>
+        ) : (
+          <PersonIcon />
+        )}
+        <span className="grow font-medium">{session?.user?.name}</span>
+        <button
+          onClick={() => signOut()}
+          className="text-red-700 dark:text-red-800 cursor-pointer text-lg"
+        >
+          <FontAwesomeIcon icon={faArrowRightFromBracket} />
+        </button>
+      </section>
     </aside>
   );
 }
