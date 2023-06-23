@@ -42,22 +42,22 @@ const InvitationList = forwardRef(function InvitationList(
     return (
       <table className="w-full text-left">
         <thead>
-          <tr className="border-y border-gray-300 dark:border-slate-700">
+          <tr>
             <th className="p-2">Email</th>
             <th className="p-2">Role</th>
             <th className="p-2"></th>
           </tr>
         </thead>
         <tbody>
-          <tr className="border-y border-gray-300 dark:border-slate-700">
+          <tr>
             <td className="p-2">
-              <div className="bg-slate-700 rounded-md h-4 p-2 animate-pulse"></div>
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-52 p-2 animate-pulse"></div>
             </td>
             <td className="p-2">
-              <div className="bg-slate-700 rounded-md h-4 p-2 animate-pulse"></div>
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-24 p-2 animate-pulse"></div>
             </td>
             <td className="p-2">
-              <div className="bg-slate-700 rounded-md h-4 p-2 animate-pulse"></div>
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-6 p-2 animate-pulse"></div>
             </td>
           </tr>
         </tbody>

@@ -78,9 +78,10 @@ export default function UserList() {
 
   if (isLoading) {
     return (
-      <table className="w-full text-left">
+      <table className="w-full text-left table-auto">
         <thead>
-          <tr className="border-y border-gray-300 dark:border-slate-700">
+          <tr>
+            <th className="p-2"></th>
             <th className="p-2">Name</th>
             <th className="p-2">Email</th>
             <th className="p-2">Role</th>
@@ -88,18 +89,21 @@ export default function UserList() {
           </tr>
         </thead>
         <tbody>
-          <tr className="border-y border-gray-300 dark:border-slate-700">
+          <tr>
             <td className="p-2">
-              <div className="bg-slate-700 rounded-md h-4 p-2 animate-pulse"></div>
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-full h-10 w-10 p-2 animate-pulse"></div>
             </td>
             <td className="p-2">
-              <div className="bg-slate-700 rounded-md h-4 p-2 animate-pulse"></div>
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-52 p-2 animate-pulse"></div>
             </td>
             <td className="p-2">
-              <div className="bg-slate-700 rounded-md h-4 p-2 animate-pulse"></div>
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-60 p-2 animate-pulse"></div>
             </td>
             <td className="p-2">
-              <div className="bg-slate-700 rounded-md h-4 p-2 animate-pulse"></div>
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-20 p-2 animate-pulse"></div>
+            </td>
+            <td className="p-2">
+              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-8 p-2 animate-pulse"></div>
             </td>
           </tr>
         </tbody>
