@@ -1,18 +1,18 @@
 @media (prefers-color-scheme: dark) {
   .SelectTrigger {
-    background-color: rgb(15 23 42) !important;
+    background-color: rgb(24 24 27) !important;
   }
   .SelectTrigger:hover {
-    background-color: rgb(30 41 59) !important;
+    background-color: rgb(39 39 42) !important;
   }
   .SelectContent {
-    background-color: rgb(15 23 42) !important;
+    background-color: rgb(24 24 27) !important;
   }
   .SelectItem[data-highlighted] {
-    background-color: rgb(30 41 59) !important;
+    background-color: rgb(39 39 42) !important;
   }
   .SelectScrollButton {
-    background-color: rgb(15 23 42) !important;
+    background-color: rgb(24 24 27) !important;
   }
 }
 .SelectTrigger {

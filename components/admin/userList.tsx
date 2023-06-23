@@ -57,7 +57,7 @@ export default function UserList() {
 
   return (
     <table className="w-full text-left">
-      <tr className="border-y border-gray-300 dark:border-slate-700">
+      <tr>
         <th className="p-2">Image</th>
         <th className="p-2">Name</th>
         <th className="p-2">Email</th>
@@ -65,10 +65,7 @@ export default function UserList() {
         <th className="p-2"></th>
       </tr>
       {data?.users.map((user) => (
-        <tr
-          key={user.id}
-          className="border-y border-gray-300 dark:border-slate-700"
-        >
+        <tr key={user.id} className="hover:bg-gray-200 dark:hover:bg-zinc-800">
           <td className="p-2">
             {user?.image ? (
               <Image

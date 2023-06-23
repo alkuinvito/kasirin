@@ -10,12 +10,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    background-color: #1f1b24;
+    background-color: rgb(9 9 11);
     color: #cacaca;
   }
 
   .SwitchRoot {
-    background-color: rgb(30 41 59) !important;
+    background-color: rgb(24 24 27) !important;
   }
 }
 
@@ -48,7 +48,7 @@ button {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 .SwitchRoot[data-state="checked"] {
-  background-color: #2db32d !important;
+  background-color: rgb(22 163 74) !important;
 }
 
 .SwitchThumb {

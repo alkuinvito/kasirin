@@ -67,42 +67,6 @@ function HomeNav(props: { pathname: String }) {
   return null;
 }
 
-function AdminNav(props: { pathname: String }) {
-  if (props.pathname === "/admin") {
-    return (
-      <>
-        <Link
-          href="/admin"
-          className="text-indigo-700 transition-colors font-semibold"
-        >
-          User Management
-        </Link>
-        <Link
-          href="/admin/products"
-          className="hover:text-indigo-700 transition-colors"
-        >
-          Products
-        </Link>
-      </>
-    );
-  } else if (props.pathname === "/admin/products") {
-    return (
-      <>
-        <Link href="/admin" className="hover:text-indigo-700 transition-colors">
-          User Management
-        </Link>
-        <Link
-          href="/admin/products"
-          className="text-indigo-700 transition-colors font-semibold"
-        >
-          Products
-        </Link>
-      </>
-    );
-  }
-  return null;
-}
-
 export default function Header(props: {
   onQuery: React.Dispatch<React.SetStateAction<string>>;
 }) {
@@ -121,7 +85,7 @@ export default function Header(props: {
         </Link>
 
         {router.pathname === "/" ? (
-          <div className="ml-8 p-2 flex items-center w-72 backdrop-blur-md bg-gray-100/50 dark:bg-gray-600/50 hover:bg-gray-200/50 hover:dark:bg-slate-800/50 focus-within:bg-gray-200/50 focus-within:dark:bg-slate-800/50 rounded-lg">
+          <div className="ml-8 p-2 flex items-center w-72 backdrop-blur-md bg-gray-100/50 dark:bg-zinc-800/50 hover:bg-gray-200/50 hover:dark:bg-zinc-600/50 focus-within:bg-gray-200/50 focus-within:dark:bg-zinc-600/50 rounded-lg transition-colors">
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
               className="mr-2 text-gray-300 dark:text-gray-500"
@@ -162,7 +126,6 @@ export default function Header(props: {
           <>
             <nav className="hidden md:flex lg:flex grow gap-4 items-start justify-end mr-4">
               <HomeNav pathname={router.pathname} />
-              <AdminNav pathname={router.pathname} />
             </nav>
 
             <AdminBadge session={session} />
@@ -188,7 +151,7 @@ export default function Header(props: {
               </Popover.Trigger>
               <Popover.Portal>
                 <Popover.Content
-                  className="PopoverContent bg-white dark:bg-slate-800 shadow-lg"
+                  className="PopoverContent bg-white dark:bg-zinc-800 shadow-lg"
                   sideOffset={10}
                   align="end"
                   side="top"

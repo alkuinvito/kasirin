@@ -1,7 +1,6 @@
 import Image from "next/image";
 import z from "zod";
 import { productSchema } from "@/lib/schema";
-import * as Switch from "@radix-ui/react-switch";
 
 export default function MenuItem({
   product,

@@ -94,7 +94,7 @@ export default function AddProduct({
         <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
-          <Dialog.Content className="bg-white dark:bg-slate-950 rounded-lg p-5 shadow-sm fixed w-[512px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <Dialog.Content className="bg-white dark:bg-zinc-800 rounded-lg p-5 shadow-sm fixed w-[512px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
               Create Product
             </Dialog.Title>
@@ -107,7 +107,7 @@ export default function AddProduct({
                   <label htmlFor="name">Name</label>
                   <FieldErrors errors={formErrors?.fieldErrors.name} />
                   <input
-                    className="w-full py-2 px-3 bg-gray-100 dark:bg-slate-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800"
+                    className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                     id="name"
                     defaultValue={currentName}
                     onChange={(e) => {

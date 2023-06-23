@@ -1,10 +1,12 @@
 import { forwardRef, useImperativeHandle } from "react";
 import { InvitationModelSchema } from "@/lib/schema";
 import { TrashIcon } from "@radix-ui/react-icons";
+import { faCubes } from "@fortawesome/free-solid-svg-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { z } from "zod";
 import ColoredRole from "@/components/shared/ColoredRole";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const InvitationList = forwardRef(function InvitationList(
   props: { onDelete: Function },
@@ -69,7 +71,7 @@ const InvitationList = forwardRef(function InvitationList(
 
   return (
     <table className="w-full text-left">
-      <tr className="border-y border-gray-300 dark:border-slate-700">
+      <tr>
         <th className="p-2">Email</th>
         <th className="p-2">Role</th>
         <th className="p-2"></th>
@@ -78,7 +80,7 @@ const InvitationList = forwardRef(function InvitationList(
         data?.invitations.map((invitation) => (
           <tr
             key={invitation.id}
-            className="border-y border-gray-300 dark:border-slate-700"
+            className="hover:bg-gray-200 dark:hover:bg-zinc-800"
           >
             <td className="p-2">{invitation.email}</td>
             <td className="p-2">
@@ -96,8 +98,11 @@ const InvitationList = forwardRef(function InvitationList(
         ))
       ) : (
         <tr className="text-center">
-          <td className="h-12" colSpan={2}>
-            No invitation to show
+          <td className=" h-28 dark:text-zinc-600" colSpan={3}>
+            <div className="h-full flex flex-col items-center justify-center gap-3">
+              <FontAwesomeIcon icon={faCubes} className="text-5xl" />
+              <span className="font-medium">No invitation to show</span>
+            </div>
           </td>
         </tr>
       )}

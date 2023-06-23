@@ -103,7 +103,7 @@ export default function Invitation() {
         </button>
       </Toast>
       <h2 className="mt-8 font-semibold text-xl">Invitations</h2>
-      <div className="mt-4 p-4 max-w-lg rounded-lg bg-gray-100 dark:bg-slate-900">
+      <div className="mt-4 p-4 max-w-lg rounded-lg bg-gray-100 dark:bg-zinc-900">
         <InvitationList onDelete={handleDelete} ref={ref} />
       </div>
       <Form.Root
@@ -117,7 +117,7 @@ export default function Invitation() {
               onChange={(e) => {
                 setEmail(e.target.value);
               }}
-              className="w-full py-2 px-3 bg-gray-100 dark:bg-slate-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800"
+              className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 focus:bg-gray-200 dark:focus:bg-zinc-800"
               placeholder="new.user@gmail.com"
               type="email"
               required

@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import AddCategory from "./add-category";
 import AddProduct from "./add-product";
+import CategoryItem from "../shared/categoryItem";
 
 export default function ProductList() {
   const getCategories = async () => {
@@ -71,45 +72,39 @@ export default function ProductList() {
     <section>
       <ul className="flex gap mb-4">
         <li>
-          <button
+          <CategoryItem
             onClick={() => {
               setCategory("all");
             }}
-            className={
-              "all" === category
-                ? "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-indigo-700 hover:bg-indigo-800 text-white transition-colors"
-                : "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-gray-200 dark:bg-slate-800 hover:bg-indigo-800 hover:text-white transition-colors"
-            }
+            active={category === "all"}
           >
             All
-          </button>
+          </CategoryItem>
         </li>
         {categoryQuery.data?.categories.map((c) => (
           <li key={c.id}>
-            <button
+            <CategoryItem
               onClick={() => {
                 setCategory(c.id);
               }}
-              className={
-                c.id === category
-                  ? "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-indigo-700 hover:bg-indigo-800 text-white transition-colors"
-                  : "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-gray-200 dark:bg-slate-800 hover:bg-indigo-800 hover:text-white transition-colors"
-              }
+              active={category === c.id}
             >
               {c.name}
-            </button>
+            </CategoryItem>
           </li>
         ))}
         <AddCategory
           onUpdate={() => categoryQuery.refetch()}
           trigger={
-            <li className="rounded-lg px-4 py-2 flex items-center mr-4 cursor-pointer bg-gray-200 dark:bg-slate-800 hover:bg-indigo-800 hover:text-white transition-colors">
-              <FontAwesomeIcon icon={faPlus} />
+            <li>
+              <CategoryItem>
+                <FontAwesomeIcon icon={faPlus} />
+              </CategoryItem>
             </li>
           }
         />
         <div className="grow"></div>
-        <li className="rounded-lg px-3 py-2 text-gray-600 dark:text-slate-600 hover:bg-gray-300 hover:dark:bg-slate-800 cursor-pointer flex items-center transition-colors ">
+        <li className="rounded-lg px-3 py-2 text-gray-600 dark:text-zinc-600 hover:bg-gray-300 hover:dark:bg-zinc-800 cursor-pointer flex items-center transition-colors">
           <DotsVerticalIcon />
         </li>
       </ul>
@@ -118,7 +113,7 @@ export default function ProductList() {
         {filtered?.map((item) => (
           <li
             key={item.id}
-            className="p-2 rounded-lg hover:text-indigo-600 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors"
           >
             <EditProduct
               product={item}
@@ -138,7 +133,7 @@ export default function ProductList() {
             )}
             onUpdate={() => productQuery.refetch()}
             trigger={
-              <li className="p-2 rounded-lg border-2 border-solid flex items-center justify-center border-gray-300 dark:border-slate-700 text-gray-400 dark:text-slate-700 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800">
+              <li className="p-2 rounded-lg border-2 border-solid flex items-center justify-center border-gray-300 dark:border-zinc-800 text-gray-400 dark:text-zinc-700 cursor-pointer hover:bg-gray-300 hover:dark:bg-zinc-800">
                 <FontAwesomeIcon icon={faPlus} className="w-10 h-10" />
               </li>
             }

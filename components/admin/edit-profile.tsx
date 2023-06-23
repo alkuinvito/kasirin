@@ -99,8 +99,8 @@ export default function EditProfile({
         <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
-          <Dialog.Content className="bg-white dark:bg-slate-950 rounded-lg p-5 shadow-sm fixed w-96 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Dialog.Title className="DialogTitle pb-3">
+          <Dialog.Content className="bg-white dark:bg-zinc-800 rounded-lg p-5 shadow-sm fixed w-96 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
               Edit profile
             </Dialog.Title>
             <Dialog.Description className="DialogDescription">
@@ -111,7 +111,7 @@ export default function EditProfile({
               <label htmlFor="name">Fullname</label>
               <FieldErrors errors={formErrors?.fieldErrors.fullname} />
               <input
-                className="w-full py-2 px-3 bg-gray-100 dark:bg-slate-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800"
+                className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                 id="name"
                 defaultValue={currentFullname}
                 onChange={(e) => {
@@ -124,7 +124,7 @@ export default function EditProfile({
               <label htmlFor="email">Email</label>
               <FieldErrors errors={formErrors?.fieldErrors.email} />
               <input
-                className="w-full py-2 px-3 bg-gray-100 dark:bg-slate-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800"
+                className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                 id="email"
                 defaultValue={email}
                 readOnly={true}
@@ -136,7 +136,7 @@ export default function EditProfile({
               <select
                 name="role"
                 id="role"
-                className="bg-gray-100 dark:bg-slate-900 rounded-lg p-2 block hover:bg-gray-200 dark:hover:bg-slate-800 focus:bg-gray-200 dark:focus:bg-slate-800 appearance-none"
+                className="bg-gray-100 dark:bg-zinc-900 rounded-lg p-2 block hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950 appearance-none"
                 value={currentRole}
                 onChange={(e) => setRole(e.target.value)}
               >

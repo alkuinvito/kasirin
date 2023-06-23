@@ -30,7 +30,7 @@ export default function NavItem({
   return (
     <Link
       href={href}
-      className="px-4 py-3 rounded-lg text-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-4"
+      className="px-4 py-3 rounded-lg text-lg font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-4"
     >
       <div className="flex justify-center w-6">
         <FontAwesomeIcon icon={icon} />

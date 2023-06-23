@@ -8,6 +8,7 @@ import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/shared/header";
 import Layout from "@/components/shared/Layout";
+import CategoryItem from "@/components/shared/categoryItem";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -88,35 +89,27 @@ export default function Home() {
           <section className="grow">
             <ul className="flex gap mb-4">
               <li>
-                <button
+                <CategoryItem
                   onClick={() => {
                     setCategory("all");
                     setFiltered(productQuery.data);
                   }}
-                  className={
-                    "all" === category
-                      ? "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-indigo-700 hover:bg-indigo-800 text-white transition-colors"
-                      : "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-gray-100 dark:bg-slate-900 hover:bg-indigo-800 hover:text-white transition-colors"
-                  }
+                  active={category === "all"}
                 >
                   All
-                </button>
+                </CategoryItem>
               </li>
               {categoryQuery.data?.categories.map((c) => (
                 <li key={c.id}>
-                  <button
+                  <CategoryItem
                     onClick={() => {
                       setCategory(c.id);
                       handleChange(c.id);
                     }}
-                    className={
-                      c.id === category
-                        ? "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-indigo-700 hover:bg-indigo-800 text-white transition-colors"
-                        : "rounded-lg px-4 py-2 mr-4 cursor-pointer font-semibold bg-gray-100 dark:bg-slate-900 hover:bg-indigo-800 hover:text-white transition-colors"
-                    }
+                    active={category === c.id}
                   >
                     {c.name}
-                  </button>
+                  </CategoryItem>
                 </li>
               ))}
             </ul>
