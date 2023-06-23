@@ -20,7 +20,7 @@ export default function SideBar() {
   const router = useRouter();
 
   return (
-    <aside className="flex flex-col w-80 h-screen px-4 border-r border-gray-200 dark:border-zinc-800">
+    <aside className="fixed left-o flex flex-col w-80 h-screen px-4 border-r border-gray-200 dark:border-zinc-800">
       <section className="py-8">
         <Link href="/">
           <h1 className="bg-clip-text text-transparent bg-gradient-to-tr from-indigo-700 to-pink-400 font-bold text-4xl text-center">
