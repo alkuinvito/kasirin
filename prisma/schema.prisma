@@ -41,6 +41,10 @@ model User {
   email         String?       @unique
   emailVerified DateTime?
   image         String?
+  phone         BigInt?       @unique
+  address       String?       @db.Text
+  gender        String?
+  dob           DateTime?
   role          String?
   accounts      Account[]
   sessions      Session[]
@@ -68,28 +72,40 @@ model Category {
 }
 
 model Variant {
+  id       String       @id @default(cuid())
+  name     String
+  price    Int          @default(0)
+  groudId  String
+  group    VariantGroup @relation(fields: [groudId], references: [id], onDelete: Cascade)
+}
+
+model VariantGroup {
   id       String    @id @default(cuid())
   name     String
-  price    Int       @default(0)
+  required Boolean?  @default(false)
+  items    Variant[]
   products Product[] @relation("ProductToVariant")
 }
 
 model Product {
-  id         String    @id @default(cuid())
+  id         String         @id @default(cuid())
   name       String
   price      Int
   image      String
+  available  Boolean?       @default(true)
   categoryId String
-  category   Category  @relation(fields: [categoryId], references: [id])
-  orders     Order[]   @relation("OrderToProduct")
-  variants   Variant[] @relation("ProductToVariant")
+  category   Category       @relation(fields: [categoryId], references: [id])
+  orders     Order[]        @relation("OrderToProduct")
+  variants   VariantGroup[] @relation("ProductToVariant")
+
+  @@index(name)
 }
 
 model Order {
   id            String      @id @default(cuid())
   transactionId String
   quantity      Int
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   products      Product[]   @relation("OrderToProduct")
 }
 
@@ -98,5 +114,5 @@ model Transaction {
   userId String
   date   DateTime @default(now())
   orders Order[]
-  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
 }

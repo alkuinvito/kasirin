@@ -1,8 +1,10 @@
-import { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
 
 export const Role = z.enum(["owner", "manager", "employee"]);
 export type Role = z.infer<typeof Role>;
+
+export const Gender = z.enum(["male", "female"]);
+export type Gender = z.infer<typeof Gender>;
 
 export const UserModelSchema = z.object({
   id: z.string(),
@@ -10,6 +12,10 @@ export const UserModelSchema = z.object({
   email: z.string().email(),
   emailVerification: z.optional(z.boolean()),
   image: z.string().nullable(),
+  phone: z.coerce.number().positive().safe().nullable(),
+  address: z.string().nullable(),
+  gender: Gender.nullable(),
+  dob: z.coerce.date().max(new Date()).nullable(),
   role: Role,
 });
 
@@ -53,36 +59,24 @@ export const variantSchema = z.object({
   id: z.string().cuid().optional(),
   name: z.string(),
   price: z.number().int().gte(0),
+  groupId: z.string().cuid().optional(),
+});
+
+export const variantGroupSchema = z.object({
+  id: z.string().cuid().optional(),
+  name: z.string(),
+  required: z.boolean().optional(),
+  items: variantSchema.array().nonempty(),
 });
 
 export const productSchema = z.object({
   id: z.string().cuid().optional(),
-  name: z
-    .string({
-      required_error: "Name must not be empty",
-      invalid_type_error: "Name must be a string",
-    })
-    .min(3, "Name must between 3 and 16 characters long")
-    .max(32, "Name must between 3 and 16 characters long"),
-  price: z
-    .number({
-      required_error: "Price must not be empty",
-      invalid_type_error: "Price must be an integer",
-    })
-    .positive("Price can not be negative value")
-    .safe(),
-  image: z
-    .string({
-      required_error: "Image must not be empty",
-    })
-    .url("Image must be a valid URL"),
-  variants: variantSchema.array().optional(),
-  categoryId: z
-    .string({
-      required_error: "Category must not be empty",
-    })
-    .cuid("Category must be a valid CUID"),
-  available: z.boolean().default(true),
+  name: z.string().min(3).max(32),
+  price: z.number().positive().safe(),
+  image: z.string().url(),
+  available: z.boolean().optional().default(true),
+  variants: variantGroupSchema.array().optional(),
+  categoryId: z.string().cuid(),
 });
 
 export const categorySchema = z.object({
