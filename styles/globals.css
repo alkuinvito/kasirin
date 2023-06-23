@@ -37,6 +37,10 @@ button {
   all: unset;
 }
 
+.SortTrigger:hover > .SortIcon {
+  display: inline !important;
+}
+
 .SwitchRoot {
   width: 42px;
   height: 25px;
