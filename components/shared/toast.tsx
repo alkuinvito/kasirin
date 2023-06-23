@@ -41,7 +41,7 @@ export const Toast = ({
       {children && (
         <ToastPrimitive.Action
           className={styles.ToastAction}
-          altText=""
+          altText={title}
           asChild
         >
           {children}
