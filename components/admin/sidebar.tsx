@@ -7,7 +7,6 @@ import { useRouter } from "next/router";
 import {
   faUser,
   faBoxesStacked,
-  faRightFromBracket,
   faArrowRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import { PersonIcon } from "@radix-ui/react-icons";

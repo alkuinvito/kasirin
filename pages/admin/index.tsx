@@ -1,4 +1,4 @@
-import AdminLayout from "@/components/admin/AdminLayout";
+import AdminLayout from "@/components/admin/adminLayout";
 import Invitation from "@/components/admin/invitation";
 import UserList from "@/components/admin/userList";
 

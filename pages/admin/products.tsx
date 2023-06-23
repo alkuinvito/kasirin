@@ -1,4 +1,4 @@
-import AdminLayout from "@/components/admin/AdminLayout";
+import AdminLayout from "@/components/admin/adminLayout";
 import ProductList from "@/components/admin/productList";
 
 export default function Page() {
