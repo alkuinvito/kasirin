@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import styles from "@/styles/menus.module.css";
 import MenuItem from "@/components/shared/menuItem";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import EditProduct from "./edit-product";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";

@@ -1,18 +1,12 @@
 import { useState } from "react";
 import { UserModelSchema } from "@/lib/schema";
 import { Pencil2Icon, PersonIcon } from "@radix-ui/react-icons";
-import {
-  faCaretDown,
-  faCaretUp,
-  faSort,
-} from "@fortawesome/free-solid-svg-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { z } from "zod";
 import EditProfile from "./edit-profile";
 import Image from "next/image";
 import ColoredRole from "@/components/shared/ColoredRole";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SortButton from "../shared/sortButton";
 
 export default function UserList() {
