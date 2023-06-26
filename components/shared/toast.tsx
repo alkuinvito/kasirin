@@ -3,7 +3,6 @@
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import { Dispatch, SetStateAction, ReactNode } from "react";
 import styles from "@/styles/toast.module.css";
-import { Cross1Icon } from "@radix-ui/react-icons";
 
 type ToastProps = {
   title: string;
@@ -47,9 +46,6 @@ export const Toast = ({
           {children}
         </ToastPrimitive.Action>
       )}
-      <ToastPrimitive.Close aria-label="Close" className="cursor-pointer">
-        <Cross1Icon aria-hidden />
-      </ToastPrimitive.Close>
     </ToastPrimitive.Root>
   );
 };
