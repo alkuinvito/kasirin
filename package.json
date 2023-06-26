@@ -36,6 +36,7 @@
     "axios": "^1.4.0",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.3",
+    "formidable": "^3.4.0",
     "next": "13.4.3",
     "next-auth": "^4.22.1",
     "postcss": "8.4.23",
@@ -46,6 +47,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/formidable": "^2.0.6",
     "prisma": "^4.15.0"
   }
 }

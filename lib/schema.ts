@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export const FormidableError = z.object({
+  code: z.number(),
+  httpCode: z.number().optional().default(500),
+  name: z.string(),
+  message: z.string(),
+  stack: z.string().optional(),
+});
+
 export const Role = z.enum(["owner", "manager", "employee"]);
 export type Role = z.infer<typeof Role>;
 
