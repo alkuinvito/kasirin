@@ -35,6 +35,7 @@ select:not([size]) {
 }
 button {
   all: unset;
+  user-select: none !important;
 }
 
 .SortTrigger:hover > .SortIcon {

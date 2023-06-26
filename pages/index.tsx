@@ -87,7 +87,7 @@ export default function Home() {
       <Layout>
         <div className="flex">
           <section className="grow">
-            <ul className="flex gap mb-4">
+            <ul className="flex gap-3 mb-4">
               <li>
                 <CategoryItem
                   onClick={() => {
