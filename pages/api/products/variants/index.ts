@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
-import { Role, variantSchema } from "@/lib/schema";
+import { Role, variantGroupSchema } from "@/lib/schema";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(
@@ -20,15 +20,21 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const data = variantSchema.safeParse(req.body);
-        if (data.success) {
-          const added = await prisma.variant.create({
-            data: data.data,
+        const variantInput = variantGroupSchema.safeParse(req.body);
+        if (variantInput.success) {
+          const added = await prisma.variantGroup.create({
+            data: {
+              name: variantInput.data.name,
+              required: variantInput.data.required,
+              items: {
+                create: variantInput.data.items,
+              },
+            },
           });
           return res.status(200).json({ variant: added });
         }
         return res.status(400).json({
-          error: data.error.flatten().fieldErrors,
+          error: variantInput.error.flatten().fieldErrors,
         });
       }
       return res.status(403).json({
