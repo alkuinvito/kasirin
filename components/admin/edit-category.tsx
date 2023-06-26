@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
@@ -6,11 +6,14 @@ import { Toast } from "../shared/toast";
 import axios from "axios";
 import z from "zod";
 import FieldErrors from "../shared/fieldErrors";
+import { Category } from "@/lib/schema";
 
-export default function AddCategory({
+export default function EditCategory({
+  category,
   onUpdate,
   trigger,
 }: {
+  category: Category;
   onUpdate: Function;
   trigger: ReactNode;
 }) {
@@ -23,20 +26,55 @@ export default function AddCategory({
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [openErr, setOpenErr] = useState(false);
-  const [currentName, setName] = useState("");
+  const [name, setName] = useState(category.name);
 
+  useEffect(() => {
+    setName(category.name);
+  }, [category]);
+
+  const handleDelete = async () => {
+    setError("");
+    setFormErrors(defaultErrors);
+
+    const options = {
+      method: "DELETE",
+      url: `/api/categories/${category.id}`,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+    axios
+      .request(options)
+      .then(() => {
+        setSuccess("Category deleted successfully");
+        setOpen(true);
+        onUpdate();
+      })
+      .catch((err) => {
+        if (err.response.status === 400) {
+          setFormErrors(err.response.data.error);
+          console.log(formErrors);
+        } else if (err.response.status === 403) {
+          const result = z.string().safeParse(err.response.data.error);
+          if (result.success) {
+            setError(result.data);
+            setOpenErr(true);
+          }
+        }
+      });
+  };
   const handleSubmit = async () => {
     setError("");
     setFormErrors(defaultErrors);
 
     const options = {
-      method: "POST",
-      url: `/api/categories`,
+      method: "PATCH",
+      url: `/api/categories/${category.id}`,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       data: {
-        name: currentName,
+        name: name,
       },
     };
     axios
@@ -59,7 +97,6 @@ export default function AddCategory({
         }
       });
   };
-
   return (
     <ToastProvider swipeDirection="right">
       <Toast
@@ -90,10 +127,11 @@ export default function AddCategory({
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
           <Dialog.Content className="bg-white dark:bg-zinc-800 rounded-lg p-5 shadow-sm fixed w-[512px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
-              Create Category
+              Edit Category
             </Dialog.Title>
             <Dialog.Description className="DialogDescription">
-              Create new category product here
+              Make changes to your category here. Click save when you&apos;re
+              done.
             </Dialog.Description>
             <div className="flex justify-between gap-4 items-center">
               <section className="grow">
@@ -103,7 +141,7 @@ export default function AddCategory({
                   <input
                     className="outline-none w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                     id="name"
-                    value={currentName}
+                    value={name}
                     onChange={(e) => {
                       setName(e.target.value);
                     }}
@@ -114,10 +152,16 @@ export default function AddCategory({
             </div>
             <div className="flex justify-between pt-5">
               <button
+                onClick={() => handleDelete()}
+                className=" py-2 px-3 text-red-600 font-medium cursor-pointer"
+              >
+                Delete
+              </button>
+              <button
                 onClick={() => handleSubmit()}
                 className=" py-2 px-3 bg-green-600 hover:bg-green-800 rounded-lg text-white font-medium cursor-pointer"
               >
-                Add category
+                Save category
               </button>
             </div>
           </Dialog.Content>

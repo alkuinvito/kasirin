@@ -19,7 +19,7 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const data = categorySchema.safeParse(req.body);
+        const data = categorySchema.partial({ id: true }).safeParse(req.body);
         if (!data.success) {
           return res.status(400).json({
             error: data.error.flatten().fieldErrors,
