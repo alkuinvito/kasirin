@@ -47,7 +47,7 @@ export default async function handler(
               name: data.data.name,
               price: data.data.price,
               image: data.data.image,
-              available: data.data.available,
+              stock: data.data.stock,
               variants: {
                 connect: data.data.variants,
               },

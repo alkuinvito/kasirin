@@ -82,7 +82,7 @@ export const productSchema = z.object({
   name: z.string().min(3).max(32),
   price: z.number().positive().safe(),
   image: z.string().url(),
-  available: z.boolean().optional().default(true),
+  stock: z.number().default(0),
   variants: variantGroupSchema.array().optional(),
   categoryId: z.string().cuid(),
 });

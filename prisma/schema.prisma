@@ -92,7 +92,7 @@ model Product {
   name       String
   price      Int
   image      String
-  available  Boolean?       @default(true)
+  stock      Int            @default(0)
   categoryId String
   category   Category       @relation(fields: [categoryId], references: [id])
   orders     Order[]        @relation("OrderToProduct")

@@ -8,7 +8,6 @@ import z from "zod";
 import FieldErrors from "../shared/fieldErrors";
 import { productSchema } from "@/lib/schema";
 import Image from "next/image";
-import * as Switch from "@radix-ui/react-switch";
 
 export default function EditProduct({
   product,
@@ -26,6 +25,7 @@ export default function EditProduct({
       image: [],
       name: [],
       price: [],
+      stock: [],
       categoryId: [],
       variants: [],
     },
@@ -36,10 +36,7 @@ export default function EditProduct({
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [openErr, setOpenErr] = useState(false);
-  const [image, setImage] = useState(product.image);
-  const [currentName, setName] = useState(product.name);
-  const [currentPrice, setPrice] = useState(product.price);
-  const [available, setAvailable] = useState(product.available);
+  const [currentProduct, setCurrentProduct] = useState(product);
 
   const handleSubmit = async (id: string) => {
     setError("");
@@ -52,10 +49,10 @@ export default function EditProduct({
         "Content-Type": "application/x-www-form-urlencoded",
       },
       data: {
-        image: image,
-        name: currentName,
-        price: currentPrice,
-        available: available,
+        image: currentProduct.image,
+        name: currentProduct.name,
+        price: currentProduct.price,
+        stock: currentProduct.stock,
       },
     };
     axios
@@ -133,11 +130,12 @@ export default function EditProduct({
                   <label htmlFor="name">Name</label>
                   <FieldErrors errors={formErrors?.fieldErrors.name} />
                   <input
+                    type="text"
                     className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                     id="name"
-                    defaultValue={currentName}
+                    value={currentProduct.name}
                     onChange={(e) => {
-                      setName(e.target.value);
+                      currentProduct.name = e.target.value;
                     }}
                     autoComplete={"off"}
                   />
@@ -146,30 +144,26 @@ export default function EditProduct({
                   <label htmlFor="price">Price</label>
                   <FieldErrors errors={formErrors?.fieldErrors.price} />
                   <input
+                    type="number"
                     className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                     id="price"
-                    defaultValue={currentPrice}
+                    value={currentProduct.price}
+                    onChange={(e) => {
+                      currentProduct.price = parseInt(e.target.value);
+                    }}
                   />
                 </fieldset>
                 <fieldset className="grid pt-2">
-                  <FieldErrors errors={formErrors?.fieldErrors.price} />
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <label htmlFor="available" style={{ paddingRight: 15 }}>
-                      Available
-                    </label>
-                    <Switch.Root
-                      className="SwitchRoot"
-                      id="available"
-                      value={available ? "on" : "off"}
-                      onChange={(e) => {
-                        setAvailable(
-                          (e.target as HTMLInputElement).value === "on"
-                        );
-                      }}
-                    >
-                      <Switch.Thumb className="SwitchThumb" />
-                    </Switch.Root>
-                  </div>
+                  <label htmlFor="stock">Stock</label>
+                  <FieldErrors errors={formErrors?.fieldErrors.stock} />
+                  <input
+                    className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
+                    id="stock"
+                    value={currentProduct.stock}
+                    onChange={(e) => {
+                      currentProduct.stock = parseInt(e.target.value);
+                    }}
+                  />
                 </fieldset>
               </section>
             </div>
