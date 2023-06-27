@@ -13,7 +13,7 @@ const parseForm = async (
   req: NextApiRequest
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return new Promise((resolve, reject) => {
-    const dir = `${__dirname}/../../../static/uploads`;
+    const dir = `${__dirname}/../../../../uploads`;
     if (!existsSync(dir)) {
       try {
         mkdirSync(dir, { recursive: false });
@@ -58,6 +58,11 @@ export default async function handler(
       } catch (e) {
         const err = FormidableError.safeParse(e);
         if (err.success) {
+          if (err.data.code === 1009) {
+            return res
+              .status(400)
+              .json({ error: "Image size must less than 2 mb" });
+          }
           return res
             .status(err.data.httpCode || 500)
             .json({ error: err.data.message });
