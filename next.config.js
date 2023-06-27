@@ -4,13 +4,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "3.bp.blogspot.com",
-        port: "",
+        hostname: "localhost",
+        port: "3000",
         pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "1.bp.blogspot.com",
+        hostname: "kasirin.vercel.app",
         port: "",
         pathname: "/**",
       },
@@ -22,6 +22,7 @@ const nextConfig = {
       },
     ],
   },
+  output: "standalone",
 };
 
 module.exports = nextConfig;
