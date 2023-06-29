@@ -10,7 +10,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "kasirin.vercel.app",
+        hostname: "kasirin.enigme.dev",
         port: "",
         pathname: "/**",
       },
