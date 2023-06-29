@@ -14,12 +14,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: "Create env file"
-        run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
-
       - name: Use Node.js 18
+        env:
+          NEXT_PUBLIC_APP_HOST: ${{ env.NEXT_PUBLIC_APP_HOST }}
+          HOSTNAME: ${{ env.HOSTNAME }}
+          PORT: ${{ env.PORT }}
+          NEXTAUTH_URL: ${{ env.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
         uses: actions/setup-node@v3
         with:
           node-version: 18
