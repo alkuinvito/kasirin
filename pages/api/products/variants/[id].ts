@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { Role, variantSchema } from "@/lib/schema";
+import { Role, variantGroupSchema } from "@/lib/schema";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(
@@ -10,44 +10,70 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const token = await getToken({ req });
+  const { id } = req.query;
+  const query = z.string().cuid().safeParse(id);
+  if (!query.success) {
+    return res.status(400).json({ error: "Invalid variant id" });
+  }
+
   switch (req.method) {
     case "PATCH":
       if (
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const { id } = req.query;
-        const query = z.string().cuid().safeParse(id);
-        if (query.success) {
-          const data = variantSchema.safeParse(req.body);
-          if (data.success) {
-            try {
-              const updated = await prisma.variant.update({
+        const variantInput = variantGroupSchema.required().safeParse(req.body);
+        if (!variantInput.success) {
+          return res.status(400).json({
+            error: variantInput.error.flatten().fieldErrors,
+          });
+        }
+
+        try {
+          const updated = await prisma.$transaction(async (tx) => {
+            const variantGroup = await tx.variantGroup.update({
+              where: {
+                id: query.data,
+              },
+              data: {
+                name: variantInput.data.name,
+                required: variantInput.data.required,
+              },
+            });
+
+            variantInput.data.items.forEach(async (item) => {
+              await tx.variant.upsert({
                 where: {
-                  id: query.data,
+                  id: item.id,
                 },
-                data: {
-                  name: data.data.name,
-                  price: data.data.price,
+                update: {
+                  name: item.name,
+                  price: item.price,
+                },
+                create: {
+                  group: {
+                    connect: {
+                      id: query.data,
+                    },
+                  },
+                  name: item.name,
+                  price: item.price,
                 },
               });
-              return res.status(200).json({
-                variant: updated,
+            });
+          });
+          return res.status(200).json({
+            variant: updated,
+          });
+        } catch (e) {
+          if (e instanceof Prisma.PrismaClientKnownRequestError) {
+            if (e.code === "P2003") {
+              return res.status(404).json({
+                error: "Variant with this id is not exist",
               });
-            } catch (e) {
-              if (e instanceof Prisma.PrismaClientKnownRequestError) {
-                if (e.code === "P2003") {
-                  return res.status(404).json({
-                    error: "Variant with this id is not exist",
-                  });
-                }
-              }
             }
           }
         }
-        return res.status(400).json({
-          error: "Invalid id",
-        });
       }
       return res.status(403).json({
         error: "Only owner or manager can update variant",
@@ -57,31 +83,24 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const { id } = req.query;
-        const query = z.string().cuid().safeParse(id);
-        if (query.success) {
-          try {
-            const deleted = await prisma.variant.delete({
-              where: {
-                id: query.data,
-              },
-            });
-            return res.status(200).json({
-              message: "Variant deleted successfully",
-            });
-          } catch (e) {
-            if (e instanceof Prisma.PrismaClientKnownRequestError) {
-              if (e.code === "P2003") {
-                return res.status(400).json({
-                  error: "Category does not exist",
-                });
-              }
+        try {
+          const deleted = await prisma.variant.delete({
+            where: {
+              id: query.data,
+            },
+          });
+          return res.status(200).json({
+            message: "Variant deleted successfully",
+          });
+        } catch (e) {
+          if (e instanceof Prisma.PrismaClientKnownRequestError) {
+            if (e.code === "P2003") {
+              return res.status(400).json({
+                error: "Category does not exist",
+              });
             }
           }
         }
-        return res.status(404).json({
-          error: "Variant with this id is not exist",
-        });
       }
       return res.status(403).json({
         error: "Only owner or manager can update variant",

@@ -11,7 +11,11 @@ export default async function handler(
 
   switch (req.method) {
     case "GET":
-      const variants = await prisma.variant.findMany();
+      const variants = await prisma.variantGroup.findMany({
+        include: {
+          items: true,
+        },
+      });
       return res.status(200).json({
         variants,
       });
