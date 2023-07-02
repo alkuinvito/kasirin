@@ -34,7 +34,7 @@ export const Toast = ({
         <ToastPrimitive.Root
           className={
             styles.ToastRoot +
-            " font-medium text-white bg-green-500 dark:bg-green-700 " +
+            " text-white bg-green-500 dark:bg-green-700 " +
             className
           }
           open={open}
@@ -48,7 +48,7 @@ export const Toast = ({
           {children && (
             <ToastPrimitive.Action
               className={styles.ToastAction}
-              altText={content}
+              altText="Close"
               asChild
             >
               {children}
@@ -61,7 +61,7 @@ export const Toast = ({
         <ToastPrimitive.Root
           className={
             styles.ToastRoot +
-            " font-medium text-white bg-red-500 dark:bg-red-700 " +
+            " text-white bg-red-500 dark:bg-red-700 " +
             className
           }
           open={open}
@@ -75,7 +75,7 @@ export const Toast = ({
           {children && (
             <ToastPrimitive.Action
               className={styles.ToastAction}
-              altText={content}
+              altText="Close"
               asChild
             >
               {children}
@@ -88,7 +88,7 @@ export const Toast = ({
         <ToastPrimitive.Root
           className={
             styles.ToastRoot +
-            " font-medium text-white bg-green-500 dark:bg-green-700 " +
+            " text-white bg-green-500 dark:bg-green-700 " +
             className
           }
           open={open}
@@ -102,7 +102,7 @@ export const Toast = ({
           {children && (
             <ToastPrimitive.Action
               className={styles.ToastAction}
-              altText={content}
+              altText="Close"
               asChild
             >
               {children}
