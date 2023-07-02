@@ -83,9 +83,9 @@ export const variantGroupSchema = z.object({
 export const productSchema = z.object({
   id: z.string().cuid().optional(),
   name: z.string().min(3).max(32),
-  price: z.number().min(100).max(100000000),
+  price: z.coerce.number().min(100).max(100000000),
   image: z.string().url(),
-  stock: z.number().min(0).max(1000).default(0),
+  stock: z.coerce.number().min(0).max(1000).default(0),
   variants: variantGroupSchema.array().optional(),
   categoryId: z.string().cuid(),
 });
