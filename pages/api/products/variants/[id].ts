@@ -30,38 +30,49 @@ export default async function handler(
         }
 
         try {
-          const updated = await prisma.$transaction(async (tx) => {
-            const variantGroup = await tx.variantGroup.update({
-              where: {
-                id: query.data,
+          await prisma.variant.deleteMany({
+            where: {
+              groudId: variantInput.data.id,
+              id: {
+                notIn: variantInput.data.items.map(({ id }) => id),
               },
-              data: {
-                name: variantInput.data.name,
-                required: variantInput.data.required,
-              },
-            });
+            },
+          });
 
-            variantInput.data.items.forEach(async (item) => {
-              await tx.variant.upsert({
-                where: {
-                  id: item.id,
-                },
-                update: {
-                  name: item.name,
-                  price: item.price,
-                },
-                create: {
-                  group: {
-                    connect: {
-                      id: query.data,
-                    },
+          variantInput.data.items.forEach(async (item) => {
+            await prisma.variant.upsert({
+              where: {
+                id: item.id,
+              },
+              update: {
+                name: item.name,
+                price: item.price,
+              },
+              create: {
+                group: {
+                  connect: {
+                    id: query.data,
                   },
-                  name: item.name,
-                  price: item.price,
                 },
-              });
+                name: item.name,
+                price: item.price,
+              },
             });
           });
+
+          const updated = await prisma.variantGroup.update({
+            where: {
+              id: query.data,
+            },
+            data: {
+              name: variantInput.data.name,
+              required: variantInput.data.required,
+            },
+            include: {
+              items: true,
+            },
+          });
+
           return res.status(200).json({
             variant: updated,
           });

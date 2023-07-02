@@ -8,6 +8,9 @@ export const FormidableError = z.object({
   stack: z.string().optional(),
 });
 
+export const Severity = z.enum(["success", "warning", "error"]);
+export type Severity = z.infer<typeof Severity>;
+
 export const Role = z.enum(["owner", "manager", "employee"]);
 export type Role = z.infer<typeof Role>;
 
@@ -64,9 +67,9 @@ export const profileSchema = z.object({
 });
 
 export const variantSchema = z.object({
-  id: z.string().cuid().optional(),
+  id: z.string().cuid(),
   name: z.string(),
-  price: z.number().int().gte(0),
+  price: z.number().min(0).max(100000000),
   groupId: z.string().cuid().optional(),
 });
 
@@ -80,9 +83,9 @@ export const variantGroupSchema = z.object({
 export const productSchema = z.object({
   id: z.string().cuid().optional(),
   name: z.string().min(3).max(32),
-  price: z.number().positive().safe(),
+  price: z.number().min(100).max(100000000),
   image: z.string().url(),
-  stock: z.number().default(0),
+  stock: z.number().min(0).max(1000).default(0),
   variants: variantGroupSchema.array().optional(),
   categoryId: z.string().cuid(),
 });
