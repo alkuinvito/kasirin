@@ -17,6 +17,27 @@ export default async function handler(
   }
 
   switch (req.method) {
+    case "GET":
+      try {
+        const found = await prisma.variantGroup.findUnique({
+          where: {
+            id: query.data,
+          },
+        });
+        if (!found) {
+          return res.status(404).json({
+            error: "Variant with this id do not exist",
+          });
+        }
+
+        return res.status(200).json({
+          variant: found,
+        });
+      } catch (e) {
+        return res.status(500).json({
+          error: "Failed to get variant",
+        });
+      }
     case "PATCH":
       if (
         token?.role === Role.enum.owner ||
@@ -78,12 +99,15 @@ export default async function handler(
           });
         } catch (e) {
           if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            if (e.code === "P2003") {
+            if (e.code === "P2025") {
               return res.status(404).json({
-                error: "Variant with this id is not exist",
+                error: "Variant with this id do not exist",
               });
             }
           }
+          return res.status(500).json({
+            error: "Failed to delete variant",
+          });
         }
       }
       return res.status(403).json({
@@ -95,26 +119,29 @@ export default async function handler(
         token?.role === Role.enum.manager
       ) {
         try {
-          const deleted = await prisma.variant.delete({
+          const deleted = await prisma.variantGroup.delete({
             where: {
               id: query.data,
             },
           });
           return res.status(200).json({
-            message: "Variant deleted successfully",
+            message: `Variant ${deleted.name} deleted successfully`,
           });
         } catch (e) {
           if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            if (e.code === "P2003") {
-              return res.status(400).json({
-                error: "Category does not exist",
+            if (e.code === "P2025") {
+              return res.status(404).json({
+                error: "Variant with this id do not exist",
               });
             }
           }
+          return res.status(500).json({
+            error: "Failed to delete variant",
+          });
         }
       }
       return res.status(403).json({
-        error: "Only owner or manager can update variant",
+        error: "Only owner or manager can delete variant",
       });
     default:
       return res.status(405).json({
