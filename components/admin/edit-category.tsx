@@ -80,7 +80,7 @@ export default function EditCategory({
     axios
       .request(options)
       .then(() => {
-        setSuccess("Category added successfully");
+        setSuccess("Category updated successfully");
         setOpen(true);
         onUpdate();
       })

@@ -156,6 +156,7 @@ export default function ProductList() {
               className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors"
             >
               <EditProduct
+                category={{ id: item.categoryId, name: "" }}
                 product={item}
                 onUpdate={() => productQuery.refetch()}
                 trigger={
