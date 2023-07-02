@@ -30,6 +30,7 @@
     "@radix-ui/react-toast": "^1.1.4",
     "@tanstack/react-query": "^4.29.14",
     "@tanstack/react-query-devtools": "^4.29.14",
+    "@types/formidable": "^3.4.0",
     "@types/node": "20.2.3",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
@@ -50,7 +51,6 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@types/formidable": "^2.0.6",
     "prisma": "^4.15.0"
   }
 }
