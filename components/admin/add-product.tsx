@@ -1,6 +1,6 @@
 import React, { ReactNode, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Cross1Icon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { Cross1Icon } from "@radix-ui/react-icons";
 import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
 import { Toast } from "../shared/toast";
 import axios from "axios";
@@ -32,7 +32,7 @@ export default function AddProduct({
 
   const [success, setSuccess] = useState("");
   const [formErrors, setFormErrors] = useState(defaultErrors);
-  const [error, setError] = useState({ title: "", content: "" });
+  const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [openErr, setOpenErr] = useState(false);
   const [image, setImage] = useState("");
@@ -72,8 +72,13 @@ export default function AddProduct({
   };
 
   const handleSubmit = async () => {
-    setError({ title: "", content: "" });
+    setError("");
     setFormErrors(defaultErrors);
+
+    if (!currentProduct.image) {
+      setFormErrors((prev) => ({ ...prev, image: ["Image can not be empty"] }));
+      return;
+    }
 
     const options = {
       method: "POST",
@@ -86,6 +91,7 @@ export default function AddProduct({
         name: currentProduct.name,
         price: currentProduct.price,
         stock: currentProduct.stock,
+        categoryId: category?.id,
       },
     };
     axios
@@ -102,7 +108,7 @@ export default function AddProduct({
         } else if (err.response.status === 403) {
           const result = z.string().safeParse(err.response.data.error);
           if (result.success) {
-            setError({ title: "Failed to add product", content: result.data });
+            setError(result.data);
             setOpenErr(true);
           }
         }
@@ -113,7 +119,7 @@ export default function AddProduct({
     <ToastProvider swipeDirection="right">
       <Toast
         severity="error"
-        content={error.content}
+        content={error}
         open={openErr}
         setOpen={setOpenErr}
       >
@@ -144,13 +150,13 @@ export default function AddProduct({
                     <Image
                       src={image}
                       alt="Uploaded image"
-                      className="max-w-[300px] h-full max-h-[200px] object-contain"
-                      width={300}
-                      height={200}
+                      className="max-w-[270px] h-full max-h-[180px] object-contain"
+                      width={270}
+                      height={180}
                     ></Image>
                   ) : (
                     <div
-                      className="w-[300px] h-[200px] border-2 border-gray-300 rounded-lg flex items-center justify-center dark:border-zinc-700 dark:text-zinc-700 cursor-pointer"
+                      className="w-[270px] h-[180px] border-2 border-gray-300 rounded-lg flex items-center justify-center dark:border-zinc-700 dark:text-zinc-700 hover:bg-gray-400 dark:hover:bg-zinc-900 cursor-pointer"
                       onClick={() => {
                         imageRef.current ? imageRef.current.click() : null;
                       }}
@@ -176,8 +182,14 @@ export default function AddProduct({
                     className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                     id="name"
                     value={currentProduct.name}
-                    onChange={(e) => (currentProduct.name = e.target.value)}
+                    onChange={(e) =>
+                      setCurrentProduct((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                     autoComplete={"off"}
+                    required={true}
                   />
                 </fieldset>
                 <div className="flex gap-3">
@@ -187,10 +199,14 @@ export default function AddProduct({
                     <input
                       className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                       id="price"
-                      value={currentProduct.price}
+                      value={currentProduct.price || 0}
                       onChange={(e) =>
-                        (currentProduct.price = parseInt(e.target.value))
+                        setCurrentProduct((prev) => ({
+                          ...prev,
+                          price: parseInt(e.target.value),
+                        }))
                       }
+                      required={true}
                     />
                   </fieldset>
                   <fieldset className="grid pt-2">
@@ -202,8 +218,12 @@ export default function AddProduct({
                       id="stock"
                       value={currentProduct.stock}
                       onChange={(e) =>
-                        (currentProduct.stock = parseInt(e.target.value))
+                        setCurrentProduct((prev) => ({
+                          ...prev,
+                          stock: parseInt(e.target.value),
+                        }))
                       }
+                      required={true}
                     />
                   </fieldset>
                 </div>
@@ -211,7 +231,7 @@ export default function AddProduct({
             </div>
             <div className="flex justify-end pt-5">
               <button
-                onClick={() => {}}
+                onClick={handleSubmit}
                 className="py-2 px-3 bg-green-600 hover:bg-green-800 rounded-lg text-white font-medium cursor-pointer"
               >
                 Create product
