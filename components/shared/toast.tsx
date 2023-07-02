@@ -3,9 +3,15 @@
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import { Dispatch, SetStateAction, ReactNode } from "react";
 import styles from "@/styles/toast.module.css";
+import { Severity } from "@/lib/schema";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleCheck,
+  faTriangleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
 
 type ToastProps = {
-  title: string;
+  severity: Severity;
   content: string;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -14,7 +20,7 @@ type ToastProps = {
 };
 
 export const Toast = ({
-  title,
+  severity,
   content,
   open,
   setOpen,
@@ -22,30 +28,87 @@ export const Toast = ({
   children,
   ...props
 }: ToastProps) => {
-  return (
-    <ToastPrimitive.Root
-      className={styles.ToastRoot + " " + className}
-      open={open}
-      onOpenChange={setOpen}
-      {...props}
-    >
-      {title && (
-        <ToastPrimitive.Title className={styles.ToastTitle}>
-          {title}
-        </ToastPrimitive.Title>
-      )}
-      <ToastPrimitive.Description className={styles.ToastDescription}>
-        {content}
-      </ToastPrimitive.Description>
-      {children && (
-        <ToastPrimitive.Action
-          className={styles.ToastAction}
-          altText={title}
-          asChild
+  switch (severity) {
+    case Severity.enum.success:
+      return (
+        <ToastPrimitive.Root
+          className={
+            styles.ToastRoot +
+            " font-medium text-white bg-green-500 dark:bg-green-700 " +
+            className
+          }
+          open={open}
+          onOpenChange={setOpen}
+          {...props}
         >
-          {children}
-        </ToastPrimitive.Action>
-      )}
-    </ToastPrimitive.Root>
-  );
+          <ToastPrimitive.Description className={styles.ToastDescription}>
+            <FontAwesomeIcon icon={faCircleCheck} className="mr-2" />
+            {content}
+          </ToastPrimitive.Description>
+          {children && (
+            <ToastPrimitive.Action
+              className={styles.ToastAction}
+              altText={content}
+              asChild
+            >
+              {children}
+            </ToastPrimitive.Action>
+          )}
+        </ToastPrimitive.Root>
+      );
+    case Severity.enum.error:
+      return (
+        <ToastPrimitive.Root
+          className={
+            styles.ToastRoot +
+            " font-medium text-white bg-red-500 dark:bg-red-700 " +
+            className
+          }
+          open={open}
+          onOpenChange={setOpen}
+          {...props}
+        >
+          <ToastPrimitive.Description className={styles.ToastDescription}>
+            <FontAwesomeIcon icon={faTriangleExclamation} className="mr-2" />
+            {content}
+          </ToastPrimitive.Description>
+          {children && (
+            <ToastPrimitive.Action
+              className={styles.ToastAction}
+              altText={content}
+              asChild
+            >
+              {children}
+            </ToastPrimitive.Action>
+          )}
+        </ToastPrimitive.Root>
+      );
+    default:
+      return (
+        <ToastPrimitive.Root
+          className={
+            styles.ToastRoot +
+            " font-medium text-white bg-green-500 dark:bg-green-700 " +
+            className
+          }
+          open={open}
+          onOpenChange={setOpen}
+          {...props}
+        >
+          <ToastPrimitive.Description className={styles.ToastDescription}>
+            <FontAwesomeIcon icon={faCircleCheck} className="mr-2" />
+            {content}
+          </ToastPrimitive.Description>
+          {children && (
+            <ToastPrimitive.Action
+              className={styles.ToastAction}
+              altText={content}
+              asChild
+            >
+              {children}
+            </ToastPrimitive.Action>
+          )}
+        </ToastPrimitive.Root>
+      );
+  }
 };

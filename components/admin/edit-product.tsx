@@ -79,8 +79,7 @@ export default function EditProduct({
   return (
     <ToastProvider swipeDirection="right">
       <Toast
-        className="text-white bg-red-500 dark:bg-red-800"
-        title="Failed to update invitation"
+        severity="error"
         content={error}
         open={openErr}
         setOpen={setOpenErr}
@@ -89,13 +88,7 @@ export default function EditProduct({
           <Cross1Icon />
         </button>
       </Toast>
-      <Toast
-        className="text-white bg-green-500 dark:bg-green-800"
-        title="Updated succesfully"
-        content={success}
-        open={open}
-        setOpen={setOpen}
-      >
+      <Toast severity="success" content={success} open={open} setOpen={setOpen}>
         <button onClick={() => setOpen(false)}>
           <Cross1Icon />
         </button>
