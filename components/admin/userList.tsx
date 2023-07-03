@@ -1,6 +1,12 @@
-import { useState } from "react";
-import { UserModelSchema } from "@/lib/schema";
-import { Pencil2Icon, PersonIcon } from "@radix-ui/react-icons";
+import { useMemo, useState } from "react";
+import { Role, UserModelSchema } from "@/lib/schema";
+import { PersonIcon } from "@radix-ui/react-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPencil,
+  faMagnifyingGlass,
+  faCircleXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { z } from "zod";
@@ -8,9 +14,44 @@ import EditProfile from "./edit-profile";
 import Image from "next/image";
 import ColoredRole from "@/components/shared/ColoredRole";
 import SortButton from "../shared/sortButton";
+import TableFooter from "../shared/tableFooter";
+
+interface Data {
+  name: string;
+  email: string;
+  role: Role;
+}
+
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+type Order = "asc" | "desc";
+
+function getComparator<Key extends keyof any>(
+  order: Order,
+  orderBy: Key
+): (
+  a: { [key in Key]: number | string },
+  b: { [key in Key]: number | string }
+) => number {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
 
 export default function UserList() {
-  const [sort, setSort] = useState("");
+  const [order, setOrder] = useState<Order>("asc");
+  const [orderBy, setOrderBy] = useState<keyof Data>("name");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [inputs, setInputs] = useState("");
 
   const getUsers = async () => {
     const response = await axios.get("/api/admin/users", {
@@ -24,51 +65,30 @@ export default function UserList() {
     queryFn: () => getUsers(),
   });
 
-  const sorted = (factor: string) => {
-    if (!(sort === factor)) {
-      switch (factor) {
-        case "name":
-          setSort(factor);
-          return data?.users.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0
-          );
-        case "email":
-          setSort(factor);
-          return data?.users.sort((a, b) =>
-            a.email > b.email ? 1 : b.email > a.email ? -1 : 0
-          );
-        case "role":
-          setSort(factor);
-          return data?.users.sort((a, b) =>
-            a.role > b.role ? 1 : b.role > a.role ? -1 : 0
-          );
-        default:
-          return data?.users;
-      }
-    }
-
-    switch (factor) {
-      case "name":
-        setSort("~" + factor);
-        return data?.users.sort((a, b) =>
-          a.name < b.name ? 1 : b.name < a.name ? -1 : 0
-        );
-      case "email":
-        setSort("~" + factor);
-        return data?.users.sort((a, b) =>
-          a.email < b.email ? 1 : b.email < a.email ? -1 : 0
-        );
-      case "role":
-        setSort("~" + factor);
-        return data?.users.sort((a, b) =>
-          a.role < b.role ? 1 : b.role < a.role ? -1 : 0
-        );
-      default:
-        return data?.users;
-    }
+  const handleRequestSort = (property: keyof Data) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
   };
 
-  const users = sorted("default");
+  const handleChangePage = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value));
+    setPage(0);
+  };
+
+  const visibleRows = useMemo(
+    () =>
+      data?.users
+        .sort(getComparator(order, orderBy))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [order, orderBy, page, rowsPerPage, data]
+  );
 
   if (isLoading) {
     return (
@@ -110,70 +130,135 @@ export default function UserList() {
   }
 
   return (
-    <table className="w-full text-left">
-      <tr>
-        <th className="p-2"></th>
-        <th
-          className="p-2"
-          onClick={() => {
-            sorted("name");
-          }}
-        >
-          <SortButton title="Name" value="name" state={sort} />
-        </th>
-        <th
-          className="p-2"
-          onClick={() => {
-            sorted("email");
-          }}
-        >
-          <SortButton title="Email" value="email" state={sort} />
-        </th>
-        <th
-          className="p-2"
-          onClick={() => {
-            sorted("role");
-          }}
-        >
-          <SortButton title="Role" value="role" state={sort} />
-        </th>
-        <th className="p-2"></th>
-      </tr>
-      {users?.map((user) => (
-        <tr key={user.id} className="hover:bg-gray-200 dark:hover:bg-zinc-800">
-          <td className="p-2">
-            {user?.image ? (
-              <Image
-                className="rounded-full"
-                src={user?.image}
-                alt={user.name}
-                width={40}
-                height={40}
-              />
-            ) : (
-              <PersonIcon />
-            )}
-          </td>
-          <td className="p-2">{user.name}</td>
-          <td className="p-2">{user.email}</td>
-          <td className="p-2">
-            <ColoredRole role={user.role} />
-          </td>
-          <td className="p-2">
-            <EditProfile
-              email={user.email}
-              fullname={user.name}
-              role={user.role}
-              trigger={
-                <button className="block mx-auto cursor-pointer">
-                  <Pencil2Icon className="w-5 h-5" />
-                </button>
-              }
-              onUpdate={() => refetch()}
+    <div className="bg-gray-100 dark:bg-zinc-900 rounded-lg">
+      <div className="p-2">
+        <div className="p-2 flex items-center w-72 bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 hover:dark:bg-zinc-700 focus-within:bg-gray-300 focus-within:dark:bg-zinc-700 rounded-lg transition-colors">
+          <FontAwesomeIcon
+            icon={faMagnifyingGlass}
+            className="mr-2 text-gray-400 dark:text-zinc-500"
+          />
+          <form className="w-full">
+            <input
+              type="text"
+              name="q"
+              placeholder="Search members..."
+              className="bg-transparent focus:outline-none w-full"
+              autoComplete="off"
+              value={inputs}
+              onInput={(e) => {
+                setInputs((e.target as HTMLInputElement).value);
+              }}
             />
-          </td>
+          </form>
+          {inputs !== "" ? (
+            <button onClick={() => setInputs("")}>
+              <FontAwesomeIcon
+                className="text-gray-400 dark:text-zinc-500"
+                icon={faCircleXmark}
+              />
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <table className="w-full text-left">
+        <tr className="bg-gray-200 dark:bg-zinc-800">
+          <th className="text-center">
+            <input type="checkbox" />
+          </th>
+          <th
+            className="px-2 py-4 font-medium"
+            onClick={() => {
+              handleRequestSort("name");
+            }}
+          >
+            <SortButton
+              title="Name"
+              value="name"
+              order={order}
+              orderBy={orderBy}
+            />
+          </th>
+          <th
+            className="px-2 py-4 font-medium"
+            onClick={() => {
+              handleRequestSort("email");
+            }}
+          >
+            <SortButton
+              title="Email"
+              value="email"
+              order={order}
+              orderBy={orderBy}
+            />
+          </th>
+          <th
+            className="px-2 py-4 font-medium"
+            onClick={() => {
+              handleRequestSort("role");
+            }}
+          >
+            <SortButton
+              title="Role"
+              value="role"
+              order={order}
+              orderBy={orderBy}
+            />
+          </th>
+          <th className="px-2 py-4 font-medium"></th>
         </tr>
-      ))}
-    </table>
+        {visibleRows?.map((user) => (
+          <tr
+            key={user.id}
+            className="hover:bg-gray-200 dark:hover:bg-zinc-800"
+          >
+            <td className="text-center">
+              <input type="checkbox" />
+            </td>
+            <td className="p-2 flex gap-3 items-center">
+              {user?.image ? (
+                <Image
+                  className="rounded-full"
+                  src={user?.image}
+                  alt={user.name}
+                  width={40}
+                  height={40}
+                />
+              ) : (
+                <PersonIcon />
+              )}
+              <span className="font-medium">{user.name}</span>
+            </td>
+            <td className="p-2">{user.email}</td>
+            <td className="p-2">
+              <ColoredRole role={user.role} />
+            </td>
+            <td className="p-2">
+              <EditProfile
+                email={user.email}
+                fullname={user.name}
+                role={user.role}
+                trigger={
+                  <button className="block mx-auto cursor-pointer">
+                    <FontAwesomeIcon
+                      icon={faPencil}
+                      className="text-gray-400"
+                    />
+                  </button>
+                }
+                onUpdate={() => refetch()}
+              />
+            </td>
+          </tr>
+        ))}
+      </table>
+      <TableFooter
+        visibleRowsLength={visibleRows?.length}
+        dataLength={data?.users.length}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
+    </div>
   );
 }
