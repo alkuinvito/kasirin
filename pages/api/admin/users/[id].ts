@@ -71,7 +71,7 @@ export default async function handler(
           }
         }
         return res.status(400).json({
-          error: info.error.flatten(),
+          error: info.error.flatten().fieldErrors,
         });
       }
       return res.status(403).json({

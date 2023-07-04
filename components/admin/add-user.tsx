@@ -6,17 +6,15 @@ import { Toast } from "../shared/toast";
 import axios from "axios";
 import z from "zod";
 import FieldErrors from "../shared/fieldErrors";
-import { Gender, Role, UserModel } from "@/lib/schema";
+import { Gender, Role, UserModelSchema } from "@/lib/schema";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 
-export default function EditProfile({
-  user,
+export default function AddUser({
   children,
   onUpdate,
 }: {
-  user: UserModel;
   children: ReactNode;
   onUpdate: Function;
 }) {
@@ -38,7 +36,11 @@ export default function EditProfile({
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [openErr, setOpenErr] = useState(false);
-  const [info, setInfo] = useState({ ...user, gender: "male" });
+  const [info, setInfo] = useState({
+    ...UserModelSchema.deepPartial().parse({}),
+    role: "owner",
+    gender: "male",
+  });
 
   const imageRef = useRef<HTMLInputElement>(null);
 
@@ -83,8 +85,8 @@ export default function EditProfile({
     }
 
     const options = {
-      method: "PATCH",
-      url: `/api/admin/users/${user.id}`,
+      method: "POST",
+      url: `/api/admin/users`,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -93,13 +95,19 @@ export default function EditProfile({
     axios
       .request(options)
       .then(() => {
-        setSuccess("Profile updated successfully");
+        setSuccess("Product added successfully");
         setOpen(true);
         onUpdate();
       })
       .catch((err) => {
         if (err.response.status === 400) {
-          setFormErrors(err.response.data.error);
+          const errMsg = z.string().safeParse(err.response.data.error);
+          if (errMsg.success) {
+            setError(errMsg.data);
+            setOpenErr(true);
+          } else {
+            setFormErrors(err.response.data.error);
+          }
         } else if (err.response.status === 403) {
           const result = z.string().safeParse(err.response.data.error);
           if (result.success) {
@@ -133,7 +141,7 @@ export default function EditProfile({
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
           <Dialog.Content className="bg-white dark:bg-zinc-800 rounded-lg p-5 shadow-sm fixed w-[640px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
-              Update Profile
+              Add User
             </Dialog.Title>
             <div className="pt-2 flex gap-4">
               <section>
@@ -192,7 +200,13 @@ export default function EditProfile({
                     className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                     id="email"
                     value={info.email}
-                    readOnly={true}
+                    onChange={(e) => {
+                      setInfo((prev) => ({
+                        ...prev,
+                        email: (e.target as HTMLInputElement).value,
+                      }));
+                    }}
+                    autoComplete={"off"}
                     required={true}
                   />
                 </fieldset>
@@ -277,7 +291,7 @@ export default function EditProfile({
                     <select
                       name="gender"
                       id="gender"
-                      value={info.gender?.toString() || "male"}
+                      value={info.gender?.toString()}
                       className="appearance-none p-2 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
                       onChange={(e) =>
                         setInfo((prev) => ({
@@ -298,7 +312,7 @@ export default function EditProfile({
                 onClick={handleSubmit}
                 className="py-2 px-3 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg text-white font-medium cursor-pointer transition-colors"
               >
-                Update profile
+                Add user
               </button>
             </div>
           </Dialog.Content>

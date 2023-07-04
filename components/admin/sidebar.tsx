@@ -8,8 +8,8 @@ import {
   faUser,
   faBoxesStacked,
   faArrowRightFromBracket,
+  faCircleUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { PersonIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import NavItem from "./navItem";
 import { signOut } from "next-auth/react";
@@ -54,7 +54,7 @@ export default function SideBar() {
             className="rounded-full"
           ></Image>
         ) : (
-          <PersonIcon />
+          <FontAwesomeIcon icon={faCircleUser} className="w-[36px] h-[36px]" />
         )}
         <span className="grow font-medium">{session?.user?.name}</span>
         <button

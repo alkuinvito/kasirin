@@ -6,6 +6,7 @@ import {
   faPencil,
   faMagnifyingGlass,
   faCircleXmark,
+  faCircleUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -224,7 +225,10 @@ export default function UserList() {
                   height={40}
                 />
               ) : (
-                <PersonIcon />
+                <FontAwesomeIcon
+                  icon={faCircleUser}
+                  className="w-[40px] h-[40px]"
+                />
               )}
               <span className="font-medium">{user.name}</span>
             </td>
@@ -233,20 +237,11 @@ export default function UserList() {
               <ColoredRole role={user.role} />
             </td>
             <td className="p-2">
-              <EditProfile
-                email={user.email}
-                fullname={user.name}
-                role={user.role}
-                trigger={
-                  <button className="block mx-auto cursor-pointer">
-                    <FontAwesomeIcon
-                      icon={faPencil}
-                      className="text-gray-400"
-                    />
-                  </button>
-                }
-                onUpdate={() => refetch()}
-              />
+              <EditProfile user={user} onUpdate={() => refetch()}>
+                <button className="block mx-auto cursor-pointer">
+                  <FontAwesomeIcon icon={faPencil} className="text-gray-400" />
+                </button>
+              </EditProfile>
             </td>
           </tr>
         ))}

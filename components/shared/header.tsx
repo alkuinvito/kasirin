@@ -6,12 +6,16 @@ import { Session } from "next-auth";
 import Image from "next/image";
 import Hamburger from "./hamburger";
 import * as Popover from "@radix-ui/react-popover";
-import { ExitIcon, PersonIcon } from "@radix-ui/react-icons";
+import { ExitIcon } from "@radix-ui/react-icons";
 import { signOut } from "next-auth/react";
 import { Role } from "@/lib/schema";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleUser,
+  faMagnifyingGlass,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function AdminBadge(props: { session: Session }) {
@@ -145,7 +149,10 @@ export default function Header(props: {
                       className="rounded-full"
                     ></Image>
                   ) : (
-                    <PersonIcon />
+                    <FontAwesomeIcon
+                      icon={faCircleUser}
+                      className="w-[36px] h-[36px]"
+                    />
                   )}
                 </button>
               </Popover.Trigger>

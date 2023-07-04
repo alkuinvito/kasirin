@@ -34,10 +34,40 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ user }) {
-      const parsedRole = Role.safeParse(user.role);
-      if (parsedRole.success) {
-        return true;
+    async signIn({ user, account }) {
+      if (user.email) {
+        const activeUser = await prisma.user.findUnique({
+          where: {
+            email: user.email,
+          },
+        });
+
+        if (activeUser) {
+          if (!activeUser.active && account) {
+            try {
+              const newAccount = await prisma.account.create({
+                data: { ...account, userId: activeUser.id },
+              });
+              const updated = await prisma.user.update({
+                where: {
+                  id: activeUser.id,
+                },
+                data: {
+                  active: true,
+                  accounts: {
+                    connect: {
+                      id: newAccount.id,
+                    },
+                  },
+                },
+              });
+            } catch (e) {
+              console.error(e);
+              return false;
+            }
+          }
+          return true;
+        }
       }
 
       const result = await prisma.user.count({
@@ -45,31 +75,17 @@ export const authOptions: NextAuthOptions = {
           role: "owner",
         },
       });
-      if (result === 0) {
-        user.role = Role.enum.owner;
-        return true;
-      }
-
-      if (user.email) {
-        const invited = await prisma.invitation.findUnique({
+      if (result === 0 && user.email) {
+        const updated = await prisma.user.update({
           where: {
             email: user.email,
           },
+          data: {
+            active: true,
+          },
         });
-
-        if (invited) {
-          const result = Role.safeParse(invited.role);
-          if (result.success) {
-            user.role = result.data;
-            await prisma.invitation.delete({
-              where: {
-                email: user.email,
-              },
-            });
-            return true;
-          }
-          return false;
-        }
+        user.role = Role.enum.owner;
+        return true;
       }
 
       return false;

@@ -44,6 +44,7 @@ model User {
   gender        String?
   dob           DateTime?
   role          String?
+  active        Boolean?
   accounts      Account[]
   sessions      Session[]
   transactions  Transaction[]
@@ -55,12 +56,6 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model Invitation {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  role  String
 }
 
 model Category {
