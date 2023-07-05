@@ -19,9 +19,10 @@ export default async function handler(
     case "POST":
       const token = await getToken({ req });
       if (token?.role === Role.enum.owner) {
-        const userInput = UserModelSchema.partial({ id: true }).safeParse(
-          req.body
-        );
+        const userInput = UserModelSchema.omit({
+          id: true,
+          active: true,
+        }).safeParse(req.body);
         if (!userInput.success) {
           return res.status(400).json({
             error: userInput.error.flatten().fieldErrors,

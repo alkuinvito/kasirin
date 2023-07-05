@@ -37,7 +37,7 @@ export default async function handler(
       return res.status(500).json({ error: "Failed to retrive user" });
     case "PATCH":
       if (token.role === Role.enum.owner) {
-        const info = UserModelSchema.safeParse(req.body);
+        const info = UserModelSchema.omit({ active: true }).safeParse(req.body);
         if (info.success) {
           try {
             const updated = await prisma.user.update({

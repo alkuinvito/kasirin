@@ -28,6 +28,7 @@ export const UserModelSchema = z.object({
   gender: Gender.nullable(),
   dob: z.coerce.date().max(new Date()).nullable(),
   role: Role,
+  active: z.boolean(),
 });
 
 export type UserModel = z.infer<typeof UserModelSchema>;
