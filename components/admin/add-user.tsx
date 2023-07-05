@@ -7,7 +7,7 @@ import axios from "axios";
 import z from "zod";
 import FieldErrors from "../shared/fieldErrors";
 import { Gender, Role, UserModelSchema } from "@/lib/schema";
-import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 
@@ -95,7 +95,7 @@ export default function AddUser({
     axios
       .request(options)
       .then(() => {
-        setSuccess("Product added successfully");
+        setSuccess("User added successfully");
         setOpen(true);
         onUpdate();
       })
@@ -147,13 +147,26 @@ export default function AddUser({
               <section>
                 <fieldset className="grid">
                   {info.image ? (
-                    <Image
-                      src={info.image}
-                      alt="Uploaded image"
-                      className="max-w-[150px] h-full max-h-[150px] object-contain rounded-full"
-                      width={150}
-                      height={150}
-                    ></Image>
+                    <div>
+                      <button
+                        className="w-[150px] h-[150px] flex flex-col items-center justify-center gap-2 opacity-0 hover:opacity-100 absolute text-white bg-black/40 dark:bg-black/70 rounded-full transition-opacity cursor-pointer"
+                        onClick={() =>
+                          imageRef.current && imageRef.current.click()
+                        }
+                      >
+                        <FontAwesomeIcon icon={faCamera} className="text-2xl" />
+                        <span className="font-medium text-sm">
+                          Upload image
+                        </span>
+                      </button>
+                      <Image
+                        src={info.image}
+                        alt="Uploaded image"
+                        className="max-w-[150px] h-full max-h-[150px] object-contain rounded-full"
+                        width={150}
+                        height={150}
+                      ></Image>
+                    </div>
                   ) : (
                     <div
                       className="flex items-center justify-center w-[150px] h-[150px] border-2 border-gray-300 rounded-full text-gray-300 dark:border-zinc-700 dark:text-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-900 cursor-pointer transition-colors"
@@ -162,14 +175,14 @@ export default function AddUser({
                       }
                     >
                       <FontAwesomeIcon icon={faImage} className="w-8 h-8" />
-                      <input
-                        ref={imageRef}
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => uploadImage(e)}
-                      />
                     </div>
                   )}
+                  <input
+                    ref={imageRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => uploadImage(e)}
+                  />
                   <FieldErrors errors={formErrors?.image} />
                 </fieldset>
               </section>

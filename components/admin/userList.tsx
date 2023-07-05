@@ -1,12 +1,18 @@
-import { useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import { Role, UserModelSchema } from "@/lib/schema";
-import { PersonIcon } from "@radix-ui/react-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPencil,
   faMagnifyingGlass,
   faCircleXmark,
   faCircleUser,
+  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,6 +27,7 @@ interface Data {
   name: string;
   email: string;
   role: Role;
+  active: boolean;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -39,21 +46,43 @@ function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
 ): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
+  a: { [key in Key]: number | string | boolean },
+  b: { [key in Key]: number | string | boolean }
 ) => number {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-export default function UserList() {
+const statusBadge = (active = true) => {
+  if (active) {
+    return (
+      <span className="px-2 py-1 text-sm font-semibold rounded-full bg-green-300/50 dark:bg-green-500/30 text-green-600 dark:text-green-400">
+        Active
+      </span>
+    );
+  }
+  return (
+    <span className="px-2 py-1 text-sm font-semibold rounded-full bg-yellow-300/50 dark:bg-yellow-500/30 text-yellow-700 dark:text-yellow-400">
+      Pending
+    </span>
+  );
+};
+
+const UserList = forwardRef(function UserList(props, ref) {
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof Data>("name");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [inputs, setInputs] = useState("");
 
+  useImperativeHandle(ref, () => {
+    return {
+      refreshUser() {
+        refetch();
+      },
+    };
+  });
   const getUsers = async () => {
     const response = await axios.get("/api/admin/users", {
       withCredentials: true,
@@ -76,9 +105,7 @@ export default function UserList() {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value));
     setPage(0);
   };
@@ -86,43 +113,41 @@ export default function UserList() {
   const visibleRows = useMemo(
     () =>
       data?.users
+        .filter((a) => a.name.toLowerCase().includes(inputs))
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, data]
+    [order, orderBy, page, rowsPerPage, data, inputs]
   );
 
   if (isLoading) {
     return (
-      <table className="w-full text-left table-auto">
-        <thead>
-          <tr>
-            <th className="p-2"></th>
-            <th className="p-2">Name</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Role</th>
-            <th className="p-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="p-2">
-              <div className="bg-gray-300 dark:bg-zinc-700 rounded-full h-10 w-10 p-2 animate-pulse"></div>
-            </td>
-            <td className="p-2">
-              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-52 p-2 animate-pulse"></div>
-            </td>
-            <td className="p-2">
-              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-60 p-2 animate-pulse"></div>
-            </td>
-            <td className="p-2">
-              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-20 p-2 animate-pulse"></div>
-            </td>
-            <td className="p-2">
-              <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-8 p-2 animate-pulse"></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="table-auto bg-gray-100 dark:bg-zinc-900 rounded-lg p-4">
+        <table className="w-full text-left">
+          <thead>
+            <tr>
+              <th className="p-2">Name</th>
+              <th className="p-2">Email</th>
+              <th className="p-2">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="p-2">
+                <div className="flex gap-3 items-center">
+                  <div className="bg-gray-300 dark:bg-zinc-700 rounded-full h-10 w-10 p-2 animate-pulse"></div>
+                  <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-52 p-2 animate-pulse"></div>
+                </div>
+              </td>
+              <td className="p-2">
+                <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-60 p-2 animate-pulse"></div>
+              </td>
+              <td className="p-2">
+                <div className="bg-gray-300 dark:bg-zinc-700 rounded-md h-6 w-20 p-2 animate-pulse"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     );
   }
 
@@ -162,89 +187,104 @@ export default function UserList() {
         </div>
       </div>
       <table className="w-full text-left">
-        <tr className="bg-gray-200 dark:bg-zinc-800">
-          <th className="text-center">
-            <input type="checkbox" />
-          </th>
-          <th
-            className="px-2 py-4 font-medium"
-            onClick={() => {
-              handleRequestSort("name");
-            }}
-          >
-            <SortButton
-              title="Name"
-              value="name"
-              order={order}
-              orderBy={orderBy}
-            />
-          </th>
-          <th
-            className="px-2 py-4 font-medium"
-            onClick={() => {
-              handleRequestSort("email");
-            }}
-          >
-            <SortButton
-              title="Email"
-              value="email"
-              order={order}
-              orderBy={orderBy}
-            />
-          </th>
-          <th
-            className="px-2 py-4 font-medium"
-            onClick={() => {
-              handleRequestSort("role");
-            }}
-          >
-            <SortButton
-              title="Role"
-              value="role"
-              order={order}
-              orderBy={orderBy}
-            />
-          </th>
-          <th className="px-2 py-4 font-medium"></th>
-        </tr>
-        {visibleRows?.map((user) => (
-          <tr
-            key={user.id}
-            className="hover:bg-gray-200 dark:hover:bg-zinc-800"
-          >
-            <td className="text-center">
-              <input type="checkbox" />
-            </td>
-            <td className="p-2 flex gap-3 items-center">
-              {user?.image ? (
-                <Image
-                  className="rounded-full"
-                  src={user?.image}
-                  alt={user.name}
-                  width={40}
-                  height={40}
-                />
-              ) : (
-                <FontAwesomeIcon
-                  icon={faCircleUser}
-                  className="w-[40px] h-[40px]"
-                />
-              )}
-              <span className="font-medium">{user.name}</span>
-            </td>
-            <td className="p-2">{user.email}</td>
-            <td className="p-2">
-              <ColoredRole role={user.role} />
-            </td>
-            <td className="p-2">
-              <EditProfile user={user} onUpdate={() => refetch()}>
-                <button className="block mx-auto cursor-pointer">
-                  <FontAwesomeIcon icon={faPencil} className="text-gray-400" />
-                </button>
-              </EditProfile>
-            </td>
+        <thead>
+          <tr className="bg-gray-200 dark:bg-zinc-800">
+            <th
+              className="py-4 pl-6 font-medium"
+              onClick={() => {
+                handleRequestSort("name");
+              }}
+            >
+              <SortButton
+                title="Name"
+                value="name"
+                order={order}
+                orderBy={orderBy}
+              />
+            </th>
+            <th
+              className="px-2 py-4 font-medium"
+              onClick={() => {
+                handleRequestSort("email");
+              }}
+            >
+              <SortButton
+                title="Email"
+                value="email"
+                order={order}
+                orderBy={orderBy}
+              />
+            </th>
+            <th
+              className="px-2 py-4 font-medium"
+              onClick={() => {
+                handleRequestSort("role");
+              }}
+            >
+              <SortButton
+                title="Role"
+                value="role"
+                order={order}
+                orderBy={orderBy}
+              />
+            </th>
+            <th
+              className="px-2 py-4 font-medium"
+              onClick={() => {
+                handleRequestSort("active");
+              }}
+            >
+              <SortButton
+                title="Status"
+                value="active"
+                order={order === "desc" ? "asc" : "desc"}
+                orderBy={orderBy}
+              />
+            </th>
+            <th className="px-2 py-4 font-medium"></th>
           </tr>
-        ))}
+        </thead>
+        <tbody>
+          {visibleRows?.map((user) => (
+            <tr
+              key={user.id}
+              className="hover:bg-gray-200 dark:hover:bg-zinc-800"
+            >
+              <td className="p-2 pl-6 flex gap-3 items-center">
+                {user?.image ? (
+                  <Image
+                    className="rounded-full"
+                    src={user?.image}
+                    alt={user.name}
+                    width={40}
+                    height={40}
+                  />
+                ) : (
+                  <FontAwesomeIcon
+                    icon={faCircleUser}
+                    className="w-[40px] h-[40px]"
+                  />
+                )}
+                <span className="font-medium">{user.name}</span>
+              </td>
+              <td className="p-2">{user.email}</td>
+              <td className="p-2">
+                <ColoredRole role={user.role} />
+              </td>
+              <td className="p-2">{statusBadge(user.active)}</td>
+              <td className="p-2">
+                <EditProfile user={user} onUpdate={refetch}>
+                  <button className="w-8 h-8 flex justify-center mx-auto items-center rounded-full hover:bg-gray-300/50 dark:hover:bg-zinc-700/50 cursor-pointer transition">
+                    <FontAwesomeIcon
+                      icon={faPencil}
+                      className="text-gray-400"
+                    />
+                  </button>
+                </EditProfile>
+              </td>
+            </tr>
+          ))}
+        </tbody>
       </table>
       <TableFooter
         visibleRowsLength={visibleRows?.length}
@@ -256,4 +296,6 @@ export default function UserList() {
       />
     </div>
   );
-}
+});
+
+export default UserList;
