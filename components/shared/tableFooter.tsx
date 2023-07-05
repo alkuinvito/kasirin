@@ -20,13 +20,13 @@ export default function TableFooter({
   onChangeRowsPerPage: Function;
 }) {
   return (
-    <div className="p-3 flex justify-end items-center gap-6">
+    <div className="py-3 px-6 flex justify-end items-center gap-6">
       <div>
         <span className="mr-2">Rows:</span>
         <select
           name="rows"
           id="rows"
-          className="appearance-none pl-3 py-1 rounded-lg dark:bg-zinc-800"
+          className="appearance-none pl-3 py-1 rounded-lg dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700 transition-colors"
           onChange={(e) => onChangeRowsPerPage(e)}
         >
           <option value="5">5</option>
