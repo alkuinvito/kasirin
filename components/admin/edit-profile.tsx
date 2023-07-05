@@ -7,9 +7,10 @@ import axios from "axios";
 import z from "zod";
 import FieldErrors from "../shared/fieldErrors";
 import { Gender, Role, UserModel } from "@/lib/schema";
-import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
+import AlertPopUp from "@/components/shared/alertPopUp";
 
 export default function EditProfile({
   user,
@@ -110,6 +111,22 @@ export default function EditProfile({
       });
   };
 
+  const handleDelete = () => {
+    setError("");
+
+    axios
+      .delete(`/api/admin/users/${info.id}`, { withCredentials: true })
+      .then((res) => {
+        setSuccess(res.data.message);
+        setOpen(true);
+        onUpdate();
+      })
+      .catch((err) => {
+        setError(err.response.data.error);
+        setOpenErr(true);
+      });
+  };
+
   return (
     <ToastProvider swipeDirection="right">
       <Toast
@@ -132,20 +149,33 @@ export default function EditProfile({
         <Dialog.Portal>
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
           <Dialog.Content className="bg-white dark:bg-zinc-800 rounded-lg p-5 shadow-sm fixed w-[640px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
+            <Dialog.Title className="pb-3 text-lg font-semibold">
               Update Profile
             </Dialog.Title>
             <div className="pt-2 flex gap-4">
               <section>
                 <fieldset className="grid">
                   {info.image ? (
-                    <Image
-                      src={info.image}
-                      alt="Uploaded image"
-                      className="max-w-[150px] h-full max-h-[150px] object-contain rounded-full"
-                      width={150}
-                      height={150}
-                    ></Image>
+                    <div>
+                      <button
+                        className="w-[150px] h-[150px] flex flex-col items-center justify-center gap-2 opacity-0 hover:opacity-100 absolute text-white bg-black/40 dark:bg-black/70 rounded-full transition-opacity cursor-pointer"
+                        onClick={() =>
+                          imageRef.current && imageRef.current.click()
+                        }
+                      >
+                        <FontAwesomeIcon icon={faCamera} className="text-2xl" />
+                        <span className="font-medium text-sm">
+                          Upload image
+                        </span>
+                      </button>
+                      <Image
+                        src={info.image}
+                        alt="Uploaded image"
+                        className="max-w-[150px] h-full max-h-[150px] object-contain rounded-full"
+                        width={150}
+                        height={150}
+                      ></Image>
+                    </div>
                   ) : (
                     <div
                       className="flex items-center justify-center w-[150px] h-[150px] border-2 border-gray-300 rounded-full text-gray-300 dark:border-zinc-700 dark:text-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-900 cursor-pointer transition-colors"
@@ -154,14 +184,14 @@ export default function EditProfile({
                       }
                     >
                       <FontAwesomeIcon icon={faImage} className="w-8 h-8" />
-                      <input
-                        ref={imageRef}
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => uploadImage(e)}
-                      />
                     </div>
                   )}
+                  <input
+                    ref={imageRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => uploadImage(e)}
+                  />
                   <FieldErrors errors={formErrors?.image} />
                 </fieldset>
               </section>
@@ -293,7 +323,17 @@ export default function EditProfile({
                 </div>
               </section>
             </div>
-            <div className="flex justify-end pt-5">
+            <div className="flex justify-between pt-5">
+              <AlertPopUp
+                title="Are you sure to delete this user?"
+                action="Delete user"
+                onAccept={handleDelete}
+                variant="red"
+              >
+                <button className="py-2 px-3 hover:bg-red-100 dark:hover:bg-red-800/10 rounded-lg text-red-500 dark:text-red-700 font-medium cursor-pointer transition-colors">
+                  Delete user
+                </button>
+              </AlertPopUp>
               <button
                 onClick={handleSubmit}
                 className="py-2 px-3 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg text-white font-medium cursor-pointer transition-colors"
