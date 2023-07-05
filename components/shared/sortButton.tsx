@@ -1,8 +1,4 @@
-import {
-  faSort,
-  faSortDown,
-  faSortUp,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function SortButton({
@@ -20,18 +16,19 @@ export default function SortButton({
   let isDesc = order === "desc";
 
   return (
-    <span className="SortTrigger select-none">
+    <button className="select-none cursor-pointer">
       <span>{title}</span>
-      {!isActive ? (
+      {!isActive ? null : isDesc ? (
         <FontAwesomeIcon
-          icon={faSort}
-          className="SortIcon hidden ml-2 text-gray-200 dark:text-zinc-700"
+          icon={faArrowDown}
+          className="ml-2 text-sm text-gray-400 dark:text-zinc-500"
         />
-      ) : isDesc ? (
-        <FontAwesomeIcon icon={faSortDown} className="ml-2" />
       ) : (
-        <FontAwesomeIcon icon={faSortUp} className="ml-2" />
+        <FontAwesomeIcon
+          icon={faArrowUp}
+          className="ml-2 text-sm text-gray-400 dark:text-zinc-500"
+        />
       )}
-    </span>
+    </button>
   );
 }
