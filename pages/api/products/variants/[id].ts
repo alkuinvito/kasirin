@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { Role, variantGroupSchema } from "@/lib/schema";
+import { Role, variantGroupSchema, variantSchema } from "@/lib/schema";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(
@@ -23,10 +23,11 @@ export default async function handler(
           where: {
             id: query.data,
           },
+          include: { items: true },
         });
         if (!found) {
           return res.status(404).json({
-            error: "Variant with this id do not exist",
+            error: "Variant does not exist",
           });
         }
 
@@ -43,7 +44,10 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const variantInput = variantGroupSchema.required().safeParse(req.body);
+        const variantInput = variantGroupSchema
+          .extend({ items: variantSchema.required().array() })
+          .required()
+          .safeParse(req.body);
         if (!variantInput.success) {
           return res.status(400).json({
             error: variantInput.error.flatten().fieldErrors,
@@ -53,7 +57,7 @@ export default async function handler(
         try {
           await prisma.variant.deleteMany({
             where: {
-              groudId: variantInput.data.id,
+              groupId: variantInput.data.id,
               id: {
                 notIn: variantInput.data.items.map(({ id }) => id),
               },
@@ -101,12 +105,12 @@ export default async function handler(
           if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === "P2025") {
               return res.status(404).json({
-                error: "Variant with this id do not exist",
+                error: "Variant does not exist",
               });
             }
           }
           return res.status(500).json({
-            error: "Failed to delete variant",
+            error: "Failed to update variant",
           });
         }
       }

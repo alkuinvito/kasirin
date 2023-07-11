@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { Role, productSchema } from "@/lib/schema";
+import { Role, productSchema, variantGroupSchema } from "@/lib/schema";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(
@@ -10,10 +10,12 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const token = await getToken({ req });
-  const { id } = req.query;
-  const query = z.string().cuid().safeParse(id);
+  const { permalink } = req.query;
+  const query = productSchema
+    .pick({ permalink: true })
+    .safeParse({ permalink: permalink });
   if (!query.success) {
-    return res.status(400).json({ error: "Invalid product id" });
+    return res.status(400).json({ error: "Invalid product name" });
   }
 
   switch (req.method) {
@@ -21,15 +23,13 @@ export default async function handler(
       try {
         const found = await prisma.product.findUnique({
           where: {
-            id: query.data,
+            permalink: query.data.permalink,
           },
-          include: {
-            variants: true,
-          },
+          include: { variants: { include: { items: true } } },
         });
         if (!found) {
           return res.status(404).json({
-            error: "Product with this id do not exist",
+            error: "Product does not exist",
           });
         }
 
@@ -46,7 +46,11 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const productInput = productSchema.safeParse(req.body);
+        const productInput = productSchema
+          .extend({
+            variants: variantGroupSchema.pick({ id: true }).array().optional(),
+          })
+          .safeParse(req.body);
         if (!productInput.success)
           return res
             .status(400)
@@ -55,14 +59,19 @@ export default async function handler(
         try {
           const updated = await prisma.product.update({
             where: {
-              id: query.data,
+              permalink: query.data.permalink,
             },
             data: {
               name: productInput.data.name,
               price: productInput.data.price,
               stock: productInput.data.stock,
               image: productInput.data.image,
+              permalink: productInput.data.permalink,
+              category: {
+                connect: { id: productInput.data.categoryId },
+              },
               variants: {
+                set: [],
                 connect: productInput.data.variants,
               },
             },
@@ -78,7 +87,7 @@ export default async function handler(
           if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === "P2025") {
               return res.status(404).json({
-                error: "Product with this id do not exist",
+                error: "Product does not exist",
               });
             }
           }
@@ -96,7 +105,7 @@ export default async function handler(
         try {
           const deleted = await prisma.product.delete({
             where: {
-              id: query.data,
+              permalink: query.data.permalink,
             },
           });
 
@@ -107,7 +116,7 @@ export default async function handler(
           if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === "P2025") {
               return res.status(404).json({
-                error: "Product with this id do not exist",
+                error: "Product does not exist",
               });
             }
           }

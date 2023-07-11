@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
-import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import { Role, categorySchema } from "@/lib/schema";
+import { z } from "zod";
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,27 +21,29 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const categories = await prisma.category.findUnique({
+        const category = await prisma.category.findUniqueOrThrow({
           where: {
             id: query.data,
           },
           include: {
-            products: true,
+            products: {
+              include: {
+                variants: { select: { name: true } },
+              },
+            },
           },
         });
-        return res.status(200).json({
-          categories,
-        });
+        return res.status(200).json({ category });
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
-          if (e.code === "P2003") {
+          if (e.code === "P2025") {
             return res.status(404).json({
-              error: "Category with this id is not exist",
+              error: "Category do not exist",
             });
           }
         }
         return res.status(500).json({
-          error: "Failed to get category",
+          error: "Failed to retrieve category",
         });
       }
     case "PATCH":
@@ -49,8 +51,10 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const data = categorySchema.partial({ id: true }).safeParse(req.body);
-        if (!data.success) {
+        const categoryInput = categorySchema
+          .pick({ name: true })
+          .safeParse(req.body);
+        if (!categoryInput.success) {
           return res.status(400).json({ error: "Invalid category" });
         }
         try {
@@ -58,7 +62,7 @@ export default async function handler(
             where: {
               id: query.data,
             },
-            data: { name: data.data.name },
+            data: { name: categoryInput.data.name },
           });
           return res.status(200).json({
             category: updated,
@@ -67,7 +71,7 @@ export default async function handler(
           if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === "P2025") {
               return res.status(404).json({
-                error: "Category with this id is not exist",
+                error: "Category do not exist",
               });
             }
           }
@@ -100,7 +104,7 @@ export default async function handler(
           if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === "P2025") {
               return res.status(404).json({
-                error: "Category with this id is not exist",
+                error: "Category do not exist",
               });
             }
           }

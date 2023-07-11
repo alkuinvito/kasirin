@@ -40,7 +40,7 @@ export default function SideBar() {
             icon={faBoxesStacked}
             title="Products"
             href="/admin/products"
-            active={router.pathname === "/admin/products"}
+            active={router.pathname.startsWith("/admin/products")}
           />
         </nav>
       </section>

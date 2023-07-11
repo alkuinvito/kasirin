@@ -54,7 +54,11 @@ export default async function handler(
       try {
         const { files } = await parseForm(req);
         const file = files.image as formidable.File[];
-        return res.status(200).json({ image: file[0].newFilename });
+        return res
+          .status(200)
+          .json({
+            image: `${process.env.NEXT_PUBLIC_APP_HOST}/uploads/${file[0].newFilename}`,
+          });
       } catch (e) {
         const err = FormidableError.safeParse(e);
         if (err.success) {

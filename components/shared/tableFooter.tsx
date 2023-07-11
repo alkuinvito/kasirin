@@ -35,7 +35,7 @@ export default function TableFooter({
       </div>
       <div>
         <span>
-          {page * rowsPerPage + 1}-
+          {visibleRowsLength ? page * rowsPerPage + 1 : 0}-
           {page * rowsPerPage + (visibleRowsLength || 0)} of {dataLength}
         </span>
       </div>

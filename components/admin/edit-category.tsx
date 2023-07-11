@@ -7,15 +7,18 @@ import axios from "axios";
 import z from "zod";
 import FieldErrors from "../shared/fieldErrors";
 import { Category } from "@/lib/schema";
+import AlertPopUp from "@/components/shared/alertPopUp";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 export default function EditCategory({
   category,
   onUpdate,
-  trigger,
+  children,
 }: {
   category: Category;
   onUpdate: Function;
-  trigger: ReactNode;
+  children: ReactNode;
 }) {
   const defaultErrors = {
     name: [],
@@ -34,7 +37,6 @@ export default function EditCategory({
 
   const handleDelete = async () => {
     setError("");
-    setFormErrors(defaultErrors);
 
     const options = {
       method: "DELETE",
@@ -51,15 +53,9 @@ export default function EditCategory({
         onUpdate();
       })
       .catch((err) => {
-        if (err.response.status === 400) {
-          setFormErrors(err.response.data.error);
-          console.log(formErrors);
-        } else if (err.response.status === 403) {
-          const result = z.string().safeParse(err.response.data.error);
-          if (result.success) {
-            setError(result.data);
-            setOpenErr(true);
-          }
+        if (err.response.data.error) {
+          setError(err.response.data.error);
+          setOpenErr(true);
         }
       });
   };
@@ -88,7 +84,7 @@ export default function EditCategory({
         if (err.response.status === 400) {
           setFormErrors(err.response.data.error);
           console.log(formErrors);
-        } else if (err.response.status === 403) {
+        } else if (err.response.status === 403 || err.response.status === 404) {
           const result = z.string().safeParse(err.response.data.error);
           if (result.success) {
             setError(result.data);
@@ -115,17 +111,13 @@ export default function EditCategory({
         </button>
       </Toast>
       <Dialog.Root>
-        <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
+        <Dialog.Trigger asChild>{children}</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
           <Dialog.Content className="bg-white dark:bg-zinc-800 rounded-lg p-5 shadow-sm fixed w-[512px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
               Edit Category
             </Dialog.Title>
-            <Dialog.Description className="DialogDescription">
-              Make changes to your category here. Click save when you&apos;re
-              done.
-            </Dialog.Description>
             <div className="flex justify-between gap-4 items-center">
               <section className="grow">
                 <fieldset className="grid pt-2">
@@ -143,18 +135,22 @@ export default function EditCategory({
                 </fieldset>
               </section>
             </div>
-            <div className="flex justify-between pt-5">
-              <button
-                onClick={() => handleDelete()}
-                className=" py-2 px-3 text-red-600 font-medium cursor-pointer"
+            <div className="flex justify-end gap-2 pt-5">
+              <AlertPopUp
+                title="Are you sure to delete this category?"
+                action="Delete category"
+                onAccept={handleDelete}
+                variant="red"
               >
-                Delete
-              </button>
+                <button className="py-2 px-3 hover:bg-red-100 dark:hover:bg-red-800/30 rounded-lg text-red-500 dark:text-red-800 cursor-pointer transition-colors">
+                  <FontAwesomeIcon icon={faTrashCan} />
+                </button>
+              </AlertPopUp>
               <button
-                onClick={() => handleSubmit()}
-                className=" py-2 px-3 bg-green-600 hover:bg-green-800 rounded-lg text-white font-medium cursor-pointer"
+                onClick={handleSubmit}
+                className="py-2 px-3 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg text-white font-medium cursor-pointer transition-colors"
               >
-                Save category
+                Save Changes
               </button>
             </div>
           </Dialog.Content>

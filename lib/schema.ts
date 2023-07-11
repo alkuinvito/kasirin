@@ -33,60 +33,35 @@ export const UserModelSchema = z.object({
 
 export type UserModel = z.infer<typeof UserModelSchema>;
 
-export const InvitationModelSchema = z.object({
-  id: z.number(),
-  email: z.string().email(),
-  role: Role,
-});
-
-export type InvitationModel = z.infer<typeof InvitationModelSchema>;
-
-export const profileSchema = z.object({
-  fullname: z
-    .string({
-      required_error: "Fullname must not be empty",
-    })
-    .regex(/[a-zA-Z][a-zA-Z ]+/, "Fullname must only contains alphabet")
-    .transform((val, ctx) => {
-      const trimmed = val.trim();
-      if (trimmed.length < 3 || trimmed.length > 40) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Fullname must between 3 and 40 characters long",
-        });
-        return z.NEVER;
-      }
-      return trimmed;
-    }),
-  email: z
-    .string({ required_error: "Email must not be empty" })
-    .email({ message: "Invalid email" }),
-  role: z.enum(Role.options, {
-    required_error: "Role must not be empty",
-    invalid_type_error: "Role must be owner, manager or employee",
-  }),
-});
-
 export const variantSchema = z.object({
-  id: z.string().cuid(),
+  id: z.string().cuid().optional(),
   name: z.string(),
   price: z.number().min(0).max(100000000),
   groupId: z.string().cuid().optional(),
 });
 
 export const variantGroupSchema = z.object({
-  id: z.string().cuid().optional(),
+  id: z.string().cuid(),
   name: z.string(),
-  required: z.boolean().optional(),
+  required: z.boolean(),
   items: variantSchema.array().nonempty(),
 });
 
 export const productSchema = z.object({
   id: z.string().cuid().optional(),
   name: z.string().min(3).max(32),
-  price: z.coerce.number().min(100).max(100000000),
+  price: z.coerce.number().min(0).max(100000000),
   image: z.string().url(),
   stock: z.coerce.number().min(0).max(1000).default(0),
+  permalink: z
+    .string()
+    .toLowerCase()
+    .regex(
+      /(^[-a-zA-Z0-9-]*)$/gi,
+      "Permalink can only contains alphanumeric and dash (-)"
+    )
+    .min(3)
+    .max(32),
   variants: variantGroupSchema.array().optional(),
   categoryId: z.string().cuid(),
 });
@@ -99,11 +74,9 @@ export const categorySchema = z.object({
 export type Category = z.infer<typeof categorySchema>;
 
 export const menuSchema = z.object({
-  categories: z
-    .object({
-      id: z.string().cuid(),
-      name: z.string(),
-      products: productSchema.array(),
-    })
-    .array(),
+  categories: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    products: productSchema.array(),
+  }),
 });

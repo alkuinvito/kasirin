@@ -23,10 +23,25 @@ export default async function handler(
               mode: "insensitive",
             },
           },
+          include: {
+            variants: {
+              select: {
+                name: true,
+              },
+            },
+          },
         });
         return res.status(200).json({ products });
       }
-      const products = await prisma.product.findMany();
+      const products = await prisma.product.findMany({
+        include: {
+          variants: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
       return res.status(200).json({
         products,
       });
@@ -35,7 +50,11 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const data = productSchema.safeParse(req.body);
+        const data = productSchema
+          .extend({
+            variants: z.object({ id: z.string().cuid() }).array().optional(),
+          })
+          .safeParse(req.body);
         if (!data.success) {
           return res.status(400).json({
             error: data.error.flatten().fieldErrors,
@@ -48,6 +67,7 @@ export default async function handler(
               price: data.data.price,
               image: data.data.image,
               stock: data.data.stock,
+              permalink: data.data.permalink,
               variants: {
                 connect: data.data.variants,
               },
@@ -63,9 +83,13 @@ export default async function handler(
               return res.status(400).json({
                 error: "Category does not exist",
               });
+            } else if (e.code === "P2002") {
+              return res.status(400).json({
+                error: "Permalink already exists",
+              });
             }
             return res.status(500).json({
-              error: "Failed to create product",
+              error: "Failed to create category",
             });
           }
         }

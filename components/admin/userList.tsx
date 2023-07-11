@@ -1,10 +1,4 @@
-import {
-  ChangeEvent,
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-  useState,
-} from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import { Role, UserModelSchema } from "@/lib/schema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,7 +6,7 @@ import {
   faMagnifyingGlass,
   faCircleXmark,
   faCircleUser,
-  faTrashCan,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -22,6 +16,7 @@ import Image from "next/image";
 import ColoredRole from "@/components/shared/ColoredRole";
 import SortButton from "../shared/sortButton";
 import TableFooter from "../shared/tableFooter";
+import AddUser from "@/components/admin/add-user";
 
 interface Data {
   name: string;
@@ -69,20 +64,13 @@ const statusBadge = (active = true) => {
   );
 };
 
-const UserList = forwardRef(function UserList(props, ref) {
+export default function UserList() {
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof Data>("name");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [inputs, setInputs] = useState("");
 
-  useImperativeHandle(ref, () => {
-    return {
-      refreshUser() {
-        refetch();
-      },
-    };
-  });
   const getUsers = async () => {
     const response = await axios.get("/api/admin/users", {
       withCredentials: true,
@@ -110,14 +98,17 @@ const UserList = forwardRef(function UserList(props, ref) {
     setPage(0);
   };
 
-  const visibleRows = useMemo(
-    () =>
-      data?.users
+  const visibleRows = useMemo(() => {
+    if (inputs.length > 2) {
+      return data?.users
         .filter((a) => a.name.toLowerCase().includes(inputs))
         .sort(getComparator(order, orderBy))
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, data, inputs]
-  );
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    }
+    return data?.users
+      .sort(getComparator(order, orderBy))
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  }, [order, orderBy, page, rowsPerPage, data, inputs]);
 
   if (isLoading) {
     return (
@@ -157,34 +148,42 @@ const UserList = forwardRef(function UserList(props, ref) {
 
   return (
     <div className="bg-gray-100 dark:bg-zinc-900 rounded-lg">
-      <div className="p-2">
-        <div className="p-2 flex items-center w-72 bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 hover:dark:bg-zinc-700 focus-within:bg-gray-300 focus-within:dark:bg-zinc-700 rounded-lg transition-colors">
-          <FontAwesomeIcon
-            icon={faMagnifyingGlass}
-            className="mr-2 text-gray-400 dark:text-zinc-500"
-          />
-          <form className="w-full">
-            <input
-              type="text"
-              name="q"
-              placeholder="Search members..."
-              className="bg-transparent focus:outline-none w-full"
-              autoComplete="off"
-              value={inputs}
-              onInput={(e) => {
-                setInputs((e.target as HTMLInputElement).value);
-              }}
+      <div className="p-2 flex justify-between items-center">
+        <div className="grow">
+          <div className="p-2 flex items-center w-72 bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 hover:dark:bg-zinc-700 focus-within:bg-gray-300 focus-within:dark:bg-zinc-700 rounded-lg transition-colors">
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="mr-2 text-gray-400 dark:text-zinc-500"
             />
-          </form>
-          {inputs !== "" ? (
-            <button onClick={() => setInputs("")}>
-              <FontAwesomeIcon
-                className="text-gray-400 dark:text-zinc-500"
-                icon={faCircleXmark}
+            <form className="w-full">
+              <input
+                type="text"
+                name="q"
+                placeholder="Search members..."
+                className="bg-transparent focus:outline-none w-full"
+                autoComplete="off"
+                value={inputs}
+                onInput={(e) => {
+                  setInputs((e.target as HTMLInputElement).value);
+                }}
               />
-            </button>
-          ) : null}
+            </form>
+            {inputs !== "" ? (
+              <button onClick={() => setInputs("")}>
+                <FontAwesomeIcon
+                  className="text-gray-400 dark:text-zinc-500"
+                  icon={faCircleXmark}
+                />
+              </button>
+            ) : null}
+          </div>
         </div>
+        <AddUser onUpdate={refetch}>
+          <button className="px-2 h-[2.25rem] bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg text-white text-sm font-medium cursor-pointer transition-colors">
+            <FontAwesomeIcon icon={faPlus} />
+            <span className="ml-1">New User</span>
+          </button>
+        </AddUser>
       </div>
       <table className="w-full text-left">
         <thead>
@@ -296,6 +295,4 @@ const UserList = forwardRef(function UserList(props, ref) {
       />
     </div>
   );
-});
-
-export default UserList;
+}

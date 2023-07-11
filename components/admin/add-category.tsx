@@ -9,10 +9,10 @@ import FieldErrors from "../shared/fieldErrors";
 
 export default function AddCategory({
   onUpdate,
-  trigger,
+  children,
 }: {
   onUpdate: Function;
-  trigger: ReactNode;
+  children: ReactNode;
 }) {
   const defaultErrors = {
     name: [],
@@ -78,16 +78,13 @@ export default function AddCategory({
         </button>
       </Toast>
       <Dialog.Root>
-        <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
+        <Dialog.Trigger asChild>{children}</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="bg-black/60 w-screen h-screen fixed top-0" />
           <Dialog.Content className="bg-white dark:bg-zinc-800 rounded-lg p-5 shadow-sm fixed w-[512px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Dialog.Title className="DialogTitle pb-3 text-lg font-semibold">
-              Create Category
+              Create new category
             </Dialog.Title>
-            <Dialog.Description className="DialogDescription">
-              Create new category product here
-            </Dialog.Description>
             <div className="flex justify-between gap-4 items-center">
               <section className="grow">
                 <fieldset className="grid pt-2">
@@ -105,12 +102,12 @@ export default function AddCategory({
                 </fieldset>
               </section>
             </div>
-            <div className="flex justify-between pt-5">
+            <div className="flex justify-end pt-5">
               <button
-                onClick={() => handleSubmit()}
-                className=" py-2 px-3 bg-green-600 hover:bg-green-800 rounded-lg text-white font-medium cursor-pointer"
+                onClick={handleSubmit}
+                className="py-2 px-3 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg text-white font-medium cursor-pointer transition-colors"
               >
-                Add category
+                Create category
               </button>
             </div>
           </Dialog.Content>

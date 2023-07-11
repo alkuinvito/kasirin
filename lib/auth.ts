@@ -76,14 +76,6 @@ export const authOptions: NextAuthOptions = {
         },
       });
       if (result === 0 && user.email) {
-        const updated = await prisma.user.update({
-          where: {
-            email: user.email,
-          },
-          data: {
-            active: true,
-          },
-        });
         user.role = Role.enum.owner;
         return true;
       }

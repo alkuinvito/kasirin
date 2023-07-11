@@ -24,7 +24,9 @@ export default async function handler(
         token?.role === Role.enum.owner ||
         token?.role === Role.enum.manager
       ) {
-        const variantInput = variantGroupSchema.safeParse(req.body);
+        const variantInput = variantGroupSchema
+          .omit({ id: true })
+          .safeParse(req.body);
         if (variantInput.success) {
           const added = await prisma.variantGroup.create({
             data: {
@@ -33,6 +35,9 @@ export default async function handler(
               items: {
                 create: variantInput.data.items,
               },
+            },
+            include: {
+              items: true,
             },
           });
           return res.status(200).json({ variant: added });

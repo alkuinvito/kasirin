@@ -44,7 +44,7 @@ model User {
   gender        String?
   dob           DateTime?
   role          String?
-  active        Boolean?
+  active        Boolean       @default(true)
   accounts      Account[]
   sessions      Session[]
   transactions  Transaction[]
@@ -59,17 +59,17 @@ model VerificationToken {
 }
 
 model Category {
-  id       String    @id @default(cuid())
-  name     String
-  products Product[]
+  id        String    @id @default(cuid())
+  name      String
+  products  Product[]
 }
 
 model Variant {
   id       String       @id @default(cuid())
   name     String
   price    Int          @default(0)
-  groudId  String
-  group    VariantGroup @relation(fields: [groudId], references: [id], onDelete: Cascade)
+  groupId  String
+  group    VariantGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model VariantGroup {
@@ -86,6 +86,7 @@ model Product {
   price      Int
   image      String
   stock      Int            @default(0)
+  permalink  String         @unique
   categoryId String
   category   Category       @relation(fields: [categoryId], references: [id])
   orders     Order[]        @relation("OrderToProduct")
