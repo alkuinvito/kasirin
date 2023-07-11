@@ -18,7 +18,6 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import AddCategory from "@/components/admin/add-category";
-import CategoryItem from "@/components/shared/categoryItem";
 import Link from "next/link";
 import SortButton from "@/components/shared/sortButton";
 import Image from "next/image";
@@ -157,11 +156,9 @@ export default function Page() {
             </span>
           </div>
           <AddCategory onUpdate={categoryQuery.refetch}>
-            <button>
-              <CategoryItem className="rounded-lg px-4 py-2 cursor-pointer font-medium bg-gray-300 dark:bg-zinc-800 hover:bg-indigo-700 dark:hover:bg-indigo-900 hover:text-white transition-colors">
-                <FontAwesomeIcon icon={faPlus} className="mr-4" />
-                <span>Create category</span>
-              </CategoryItem>
+            <button className="rounded-lg px-4 py-2 cursor-pointer font-medium bg-gray-300 dark:bg-zinc-800 hover:bg-indigo-700 dark:hover:bg-indigo-900 hover:text-white transition-colors">
+              <FontAwesomeIcon icon={faPlus} className="mr-4" />
+              <span>Create category</span>
             </button>
           </AddCategory>
         </div>

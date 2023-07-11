@@ -1,12 +1,14 @@
 import Image from "next/image";
 import z from "zod";
-import { productSchema } from "@/lib/schema";
+import { productSchema, variantGroupSchema } from "@/lib/schema";
 
-export default function MenuItem({
-  product,
-}: {
-  product: z.infer<typeof productSchema>;
-}) {
+const ProductProp = productSchema.extend({
+  variants: variantGroupSchema.pick({ name: true }).array().optional(),
+});
+
+type ProductPropType = z.infer<typeof ProductProp>;
+
+export default function MenuItem({ product }: { product: ProductPropType }) {
   return (
     <div className="flex flex-col rounded-lg" key={product.id}>
       <Image

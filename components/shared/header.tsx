@@ -71,12 +71,9 @@ function HomeNav(props: { pathname: String }) {
   return null;
 }
 
-export default function Header(props: {
-  onQuery: React.Dispatch<React.SetStateAction<string>>;
-}) {
+export default function Header({ children }: { children?: React.ReactNode }) {
   const { data: session } = useSession();
   const router = useRouter();
-  const [inputs, setInputs] = useState("");
 
   return (
     <div className="z-30 shadow-lg backdrop-blur-md fixed top-0 w-full py-2 bg-white/50 dark:bg-slate-950/50">
@@ -88,43 +85,7 @@ export default function Header(props: {
           </h1>
         </Link>
 
-        {router.pathname === "/" ? (
-          <div className="ml-8 p-2 flex items-center w-72 backdrop-blur-md bg-gray-100/50 dark:bg-zinc-800/50 hover:bg-gray-200/50 hover:dark:bg-zinc-600/50 focus-within:bg-gray-200/50 focus-within:dark:bg-zinc-600/50 rounded-lg transition-colors">
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
-              className="mr-2 text-gray-300 dark:text-gray-500"
-            />
-            <form
-              className="w-full"
-              onSubmit={(e) => {
-                e.preventDefault();
-                props.onQuery(inputs);
-              }}
-            >
-              <input
-                type="text"
-                name="q"
-                placeholder="Search products..."
-                className="bg-transparent focus:outline-none w-full"
-                autoComplete="off"
-                value={inputs}
-                onInput={(e) => {
-                  setInputs((e.target as HTMLInputElement).value);
-                }}
-              />
-            </form>
-            {inputs !== "" ? (
-              <button
-                onClick={() => {
-                  setInputs("");
-                  props.onQuery("");
-                }}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-            ) : null}
-          </div>
-        ) : null}
+        {children}
 
         {session?.user ? (
           <>
@@ -137,7 +98,7 @@ export default function Header(props: {
             <Popover.Root>
               <Popover.Trigger asChild>
                 <button
-                  className="IconButton bg-gray-300 dark:bg-gray-900"
+                  className="IconButton bg-gray-300 dark:bg-zinc-900"
                   aria-label="Profile"
                 >
                   {session?.user?.image ? (

@@ -31,7 +31,6 @@ export default async function handler(
           const added = await prisma.category.create({
             data: {
               name: data.data.name,
-              permalink: data.data.permalink,
             },
           });
           return res.status(200).json({

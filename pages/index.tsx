@@ -1,17 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import OrderList from "../components/shared/orderList";
 import styles from "@/styles/menus.module.css";
 import MenuItem from "@/components/shared/menuItem";
 import axios from "axios";
-import { categorySchema, productSchema } from "@/lib/schema";
+import {
+  categorySchema,
+  productSchema,
+  variantGroupSchema,
+} from "@/lib/schema";
 import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/shared/header";
 import Layout from "@/components/shared/Layout";
-import CategoryItem from "@/components/shared/categoryItem";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronLeft,
+  faChevronRight,
+  faCircleXmark,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
+import Pagination from "@/components/shared/pagination";
 
 export default function Home() {
+  const [category, setCategory] = useState("all");
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const [len, setLen] = useState(0);
+
   const getCategories = async () => {
     const response = await axios.get("/api/categories", {
       withCredentials: true,
@@ -25,7 +40,18 @@ export default function Home() {
     const response = await axios.get("/api/products", {
       withCredentials: true,
     });
-    return z.object({ products: productSchema.array() }).parse(response.data);
+    return z
+      .object({
+        products: productSchema
+          .extend({
+            variants: variantGroupSchema
+              .pick({ name: true })
+              .array()
+              .optional(),
+          })
+          .array(),
+      })
+      .parse(response.data);
   };
 
   const categoryQuery = useQuery({
@@ -38,86 +64,82 @@ export default function Home() {
     queryFn: () => getProducts(),
   });
 
-  const [category, setCategory] = useState("all");
-  const [filtered, setFiltered] = useState(productQuery.data);
-
-  const handleChange = (id: string) => {
-    const filteredProducts = z
-      .object({
-        products: productSchema.array(),
-      })
-      .safeParse({
-        products: productQuery.data?.products.filter(
-          (p) => p.categoryId === id
-        ),
-      });
-    if (filteredProducts.success) {
-      setFiltered(filteredProducts.data);
-    } else {
-      console.error(filteredProducts.error.flatten().formErrors);
-    }
+  const handleChangePage = (newPage: number) => {
+    setPage(newPage);
   };
 
-  useEffect(() => {
-    if (query != "") {
-      axios
-        .get(`/api/products?q=${query}`, { withCredentials: true })
-        .then((res) => {
-          setCategory("");
-          const result = z
-            .object({
-              products: productSchema.array().nonempty(),
-            })
-            .safeParse(res.data);
-          if (result.success) {
-            setFiltered(result.data);
-            console.log(result.data);
-          } else {
-            console.error(result.error.flatten());
-          }
-        });
-    } else {
-      setFiltered(productQuery.data);
+  const visibleRows = useMemo(() => {
+    const filtered = productQuery.data?.products.filter(
+      (p) => p.categoryId === category || category === "all"
+    );
+    setLen(filtered?.length || 0);
+
+    if (query.length > 2) {
+      return filtered
+        ?.filter((a) => a.name.toLowerCase().includes(query))
+        .slice(page * 25, page * 25 + 25);
     }
-  }, [query, productQuery.data]);
+    return filtered?.slice(page * 25, page * 25 + 25);
+  }, [page, productQuery.data?.products, query, category]);
 
   return (
     <main>
-      <Header onQuery={setQuery} />
+      <Header>
+        <div className="w-full mx-4 flex gap-2">
+          <select
+            className="w-52 py-2 px-3 bg-gray-100 dark:bg-zinc-800/50 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-600/50 focus:bg-gray-200 dark:focus:bg-zinc-800 appearance-none"
+            value={category}
+            onChange={(e) => setCategory((e.target as HTMLSelectElement).value)}
+          >
+            <option key="all" value="all">
+              All
+            </option>
+            {categoryQuery.data?.categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <div className="grow p-2 flex items-center backdrop-blur-md bg-gray-100/50 dark:bg-zinc-800/50 hover:bg-gray-200/50 hover:dark:bg-zinc-600/50 focus-within:bg-gray-200/50 focus-within:dark:bg-zinc-600/50 rounded-lg transition-colors">
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="mr-2 text-gray-300 dark:text-gray-500"
+            />
+            <input
+              type="text"
+              name="q"
+              placeholder="Search products..."
+              className="bg-transparent focus:outline-none w-full"
+              value={query}
+              onChange={(e) => {
+                setQuery((e.target as HTMLInputElement).value);
+              }}
+              autoComplete="off"
+            />
+            {query !== "" ? (
+              <button onClick={() => setQuery("")}>
+                <FontAwesomeIcon
+                  className="text-gray-300 dark:text-zinc-600"
+                  icon={faCircleXmark}
+                />
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </Header>
       <Layout>
         <div className="flex">
           <section className="grow">
-            <ul className="flex gap-3 mb-4">
-              <li>
-                <CategoryItem
-                  onClick={() => {
-                    setCategory("all");
-                    setFiltered(productQuery.data);
-                  }}
-                  active={category === "all"}
-                >
-                  All
-                </CategoryItem>
-              </li>
-              {categoryQuery.data?.categories.map((c) => (
-                <li key={c.id}>
-                  <CategoryItem
-                    onClick={() => {
-                      setCategory(c.id);
-                      handleChange(c.id);
-                    }}
-                    active={category === c.id}
-                  >
-                    {c.name}
-                  </CategoryItem>
-                </li>
-              ))}
-            </ul>
-            <div className={styles.MenuList}>
-              {filtered?.products.map((item) => (
-                <MenuItem key={item.id} product={item}></MenuItem>
+            <div className={styles.MenuList + " h-full"}>
+              {visibleRows?.map((product) => (
+                <MenuItem key={product.id} product={product} />
               ))}
             </div>
+            <Pagination
+              dataLength={len}
+              page={page}
+              onChangePage={handleChangePage}
+            />
           </section>
           <section className="h-fit sticky top-20 ml-5">
             <OrderList></OrderList>
