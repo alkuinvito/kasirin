@@ -234,10 +234,10 @@ export default function Page() {
                   className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950 appearance-none"
                   id="category"
                   value={currentProduct.categoryId}
-                  onSelect={(e) =>
+                  onChange={(e) =>
                     setCurrentProduct((prev) => ({
                       ...prev,
-                      categoryId: (e.target as HTMLSelectElement).value,
+                      categoryId: e.target.value,
                     }))
                   }
                   required={true}
