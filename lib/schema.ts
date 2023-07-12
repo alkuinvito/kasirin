@@ -73,10 +73,24 @@ export const categorySchema = z.object({
 
 export type Category = z.infer<typeof categorySchema>;
 
-export const menuSchema = z.object({
-  categories: z.object({
-    id: z.string().cuid(),
-    name: z.string(),
-    products: productSchema.array(),
-  }),
+export const OrderModelSchema = z.object({
+  id: z.string().cuid().optional(),
+  transactionId: z.string().cuid().optional(),
+  productId: z.string().cuid(),
+  product: productSchema.optional(),
+  price: z.coerce.number().min(0).max(100000000).optional(),
+  quantity: z.coerce.number().min(1).max(1000),
+  variants: variantSchema.array().optional(),
+  notes: z.string().max(256).optional(),
 });
+
+export type OrderModel = z.infer<typeof OrderModelSchema>;
+
+export const TransactionModelSchema = z.object({
+  id: z.string().cuid().optional(),
+  userId: z.string().cuid(),
+  date: z.coerce.date().max(new Date()).optional(),
+  orders: OrderModelSchema.array().nonempty(),
+});
+
+export type TransactionModel = z.infer<typeof TransactionModelSchema>;
