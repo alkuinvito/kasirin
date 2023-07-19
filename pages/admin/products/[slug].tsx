@@ -91,7 +91,6 @@ export default function Page(
   const [open, setOpen] = useState(false);
   const [openErr, setOpenErr] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(props.product);
-  console.log(currentProduct);
 
   const imageRef = useRef<HTMLInputElement>(null);
 
