@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
-import { TransactionModelSchema } from "@/lib/schema";
+import { TransactionModelSchema, variantSchema } from "@/lib/schema";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
@@ -104,26 +104,52 @@ export default async function handler(
               },
             });
 
-            await tx.order.create({
-              data: {
-                price: product.price,
-                quantity: order.quantity,
-                notes: order.notes,
-                variants: {
-                  connect: order.variants,
-                },
-                product: {
-                  connect: {
-                    id: order.productId,
+            const parsedVariants = variantSchema
+              .pick({ id: true })
+              .required()
+              .array()
+              .safeParse(order.variants);
+
+            if (parsedVariants.success) {
+              await tx.order.create({
+                data: {
+                  price: product.price,
+                  quantity: order.quantity,
+                  notes: order.notes,
+                  variants: {
+                    connect: parsedVariants.data,
+                  },
+                  product: {
+                    connect: {
+                      id: order.productId,
+                    },
+                  },
+                  transaction: {
+                    connect: {
+                      id: newTransaction.id,
+                    },
                   },
                 },
-                transaction: {
-                  connect: {
-                    id: newTransaction.id,
+              });
+            } else {
+              await tx.order.create({
+                data: {
+                  price: product.price,
+                  quantity: order.quantity,
+                  notes: order.notes,
+                  product: {
+                    connect: {
+                      id: order.productId,
+                    },
+                  },
+                  transaction: {
+                    connect: {
+                      id: newTransaction.id,
+                    },
                   },
                 },
-              },
-            });
+              });
+            }
           }
 
           return newTransaction;
