@@ -1,13 +1,18 @@
 import { NextApiRequest, NextApiResponse, PageConfig } from "next";
 import formidable from "formidable";
-import { mkdirSync, existsSync } from "fs";
+import { mkdirSync, existsSync, unlinkSync } from "fs";
 import { FormidableError } from "@/lib/schema";
+const cloudinary = require("cloudinary").v2;
 
 export const config: PageConfig = {
   api: {
     bodyParser: false,
   },
 };
+
+cloudinary.config({
+  secure: true,
+});
 
 const parseForm = async (
   req: NextApiRequest
@@ -36,11 +41,24 @@ const parseForm = async (
       },
     });
 
-    form.parse(req, function (err, fields, files) {
+    form.parse(req, async (err, fields, files) => {
       if (err) {
         return reject(err);
       }
-      return resolve({ fields, files });
+
+      const options = {
+        use_filename: true,
+        unique_filename: false,
+        overwrite: true,
+      };
+
+      const file = files.image as formidable.File[];
+      const result = await cloudinary.uploader.upload(
+        file[0].filepath,
+        options
+      );
+      unlinkSync(file[0].filepath);
+      return resolve(result.secure_url);
     });
   });
 };
@@ -52,13 +70,10 @@ export default async function handler(
   switch (req.method) {
     case "POST":
       try {
-        const { files } = await parseForm(req);
-        const file = files.image as formidable.File[];
-        return res
-          .status(200)
-          .json({
-            image: `${process.env.NEXT_PUBLIC_APP_HOST}/uploads/${file[0].newFilename}`,
-          });
+        const filename = await parseForm(req);
+        return res.status(200).json({
+          image: filename,
+        });
       } catch (e) {
         const err = FormidableError.safeParse(e);
         if (err.success) {
