@@ -1,0 +1,81 @@
+@media (prefers-color-scheme: dark) {
+  .SelectTrigger {
+    background-color: rgb(24 24 27) !important;
+  }
+  .SelectTrigger:hover {
+    background-color: rgb(39 39 42) !important;
+  }
+  .SelectContent {
+    background-color: rgb(24 24 27) !important;
+  }
+  .SelectItem[data-highlighted] {
+    background-color: rgb(39 39 42) !important;
+  }
+  .SelectScrollButton {
+    background-color: rgb(24 24 27) !important;
+  }
+}
+.SelectTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.5rem;
+  padding: 0 15px;
+  font-size: 100%;
+  line-height: 1;
+  height: 40px;
+  width: 96px;
+  background-color: rgb(243 244 246);
+  box-shadow: 0 2px 10px var(#000000);
+}
+.SelectTrigger:hover {
+  background-color: rgb(229 231 235);
+}
+.SelectTrigger[data-placeholder] {
+  color: #000000;
+}
+.SelectValue {
+  flex-grow: 1;
+}
+.SelectContent {
+  width: 120px;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+}
+.SelectViewport {
+  padding: 5px;
+}
+.SelectItem {
+  font-size: 100%;
+  line-height: 1;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 35px 0 25px;
+  position: relative;
+  user-select: none;
+}
+.SelectItem[data-highlighted] {
+  outline: none;
+  background-color: rgb(229 231 235);
+}
+.SelectItemIndicator {
+  position: absolute;
+  left: 0;
+  width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.SelectScrollButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  background-color: #ffffff;
+  cursor: default;
+}

@@ -1,29 +1,26 @@
-datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+generator client {
+  provider = "prisma-client-js"
 }
 
-generator client {
-  provider        = "prisma-client-js"
+datasource db {
+  provider          = "postgresql"
+  url               = env("POSTGRES_URL")
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -37,14 +34,20 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?       @unique
   emailVerified DateTime?
   image         String?
-  role          String?  // New column
+  phone         BigInt?       @unique
+  address       String?       @db.Text
+  gender        String?
+  dob           DateTime?
+  role          String?
+  active        Boolean       @default(true)
   accounts      Account[]
   sessions      Session[]
+  transactions  Transaction[]
 }
 
 model VerificationToken {
@@ -53,4 +56,62 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  products  Product[]
+}
+
+model Variant {
+  id       String       @id @default(cuid())
+  name     String
+  price    Int          @default(0)
+  groupId  String
+  group    VariantGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  orders   Order[]
+}
+
+model VariantGroup {
+  id       String    @id @default(cuid())
+  name     String
+  required Boolean?  @default(false)
+  items    Variant[]
+  products Product[] @relation("ProductToVariant")
+}
+
+model Product {
+  id         String         @id @default(cuid())
+  name       String
+  price      Int
+  image      String
+  stock      Int            @default(0)
+  permalink  String         @unique
+  categoryId String
+  category   Category       @relation(fields: [categoryId], references: [id])
+  orders     Order[]
+  variants   VariantGroup[] @relation("ProductToVariant")
+
+  @@index(name)
+}
+
+model Order {
+  id            String         @id @default(cuid())
+  transactionId String
+  productId     String
+  price         Int
+  quantity      Int
+  variants      Variant[]
+  notes         String?
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  product       Product        @relation(fields: [productId], references: [id])
+}
+
+model Transaction {
+  id     String   @id @default(cuid())
+  userId String
+  date   DateTime @default(now())
+  orders Order[]
+  user   User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
 }

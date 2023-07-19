@@ -1,17 +1,23 @@
+import { NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
 
-// More on how NextAuth.js middleware works: https://next-auth.js.org/configuration/nextjs#middleware
-export default withAuth({
-  callbacks: {
-    authorized({ req, token }) {
-      // `/admin` requires admin role
-      if (req.nextUrl.pathname === "/admin") {
-        return token?.userRole === "admin";
+export default withAuth(
+  function middleware(req) {
+    if (
+      req.nextUrl.pathname.startsWith("/admin") ||
+      req.nextUrl.pathname.startsWith("/api/admin")
+    ) {
+      if (req.nextauth.token?.role === "employee") {
+        return NextResponse.rewrite(
+          new URL("/auth/signin?error=AccessDenied", req.url)
+        );
       }
-      // `/me` only requires the user to be logged in
-      return !!token;
-    },
+    }
   },
-});
-
-export const config = { matcher: ["/admin", "/me"] };
+  {
+    pages: {
+      signIn: "/auth/signin",
+      error: "/auth/error",
+    },
+  }
+);

@@ -1,0 +1,15 @@
+node_modules
+.next
+.yarn
+uploads
+.git
+Dockerfile
+.dockerignore
+README.md
+LICENSE
+yarn-debug.log
+npm-debug.log
+.idea
+.vscode
+.github
+.env*
