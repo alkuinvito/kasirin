@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  nextjs:
+    restart: always
+    image: alkuinvito/kasirin:latest
+    env_file:
+      - .env
+    build: .
+    expose:
+      - 3000
+  tunnel:
+    container_name: cloudflared-tunnel
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
