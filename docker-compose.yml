@@ -5,7 +5,6 @@ services:
     image: alkuinvito/kasirin:latest
     env_file:
       - .env
-    build: .
     expose:
       - 3000
   tunnel:
