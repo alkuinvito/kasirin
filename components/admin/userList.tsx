@@ -252,7 +252,7 @@ export default function UserList() {
               <td className="p-2 pl-6 flex gap-3 items-center">
                 {user?.image ? (
                   <Image
-                    className="rounded-full"
+                    className="w-[40px] h-[40px] rounded-full object-cover"
                     src={user?.image}
                     alt={user.name}
                     width={40}
