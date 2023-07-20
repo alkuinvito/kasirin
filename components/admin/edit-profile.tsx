@@ -62,7 +62,7 @@ export default function EditProfile({
         if (imageUrl.success) {
           setInfo((prev) => ({
             ...prev,
-            image: `${process.env.NEXT_PUBLIC_APP_HOST}/uploads/${imageUrl.data.image}`,
+            image: imageUrl.data.image,
           }));
         }
       })
@@ -171,7 +171,7 @@ export default function EditProfile({
                       <Image
                         src={info.image}
                         alt="Uploaded image"
-                        className="max-w-[150px] h-full max-h-[150px] object-contain rounded-full"
+                        className="max-w-[150px] h-full max-h-[150px] object-cover rounded-full"
                         width={150}
                         height={150}
                       ></Image>
