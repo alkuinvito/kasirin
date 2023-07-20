@@ -44,6 +44,7 @@ jobs:
           envs: TUNNEL_TOKEN
           script: |
             cd ~/dev/kasirin
+            git switch production
             git pull
             docker pull alkuinvito/kasirin:latest
             docker compose up -d --force-recreate
