@@ -14,8 +14,6 @@ import Header from "@/components/shared/header";
 import Layout from "@/components/shared/Layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faChevronLeft,
-  faChevronRight,
   faCircleXmark,
   faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";

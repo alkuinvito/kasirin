@@ -1,7 +1,7 @@
 # Kasirin
 
 [![ci/cd](https://github.com/alkuinvito/kasirin/actions/workflows/main.yml/badge.svg)](https://github.com/alkuinvito/kasirin/actions/workflows/main.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## 💬 Introduction
 Kasirin is an content management system-based cashier application. This project is fully built using Typescript on Next JS for both frontend and backend, also utilizing Next Auth as main authenticator.
