@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import Image from "next/image";
@@ -11,11 +11,7 @@ import { signOut } from "next-auth/react";
 import { Role } from "@/lib/schema";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {
-  faCircleUser,
-  faMagnifyingGlass,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function AdminBadge(props: { session: Session }) {
@@ -107,7 +103,7 @@ export default function Header({ children }: { children?: React.ReactNode }) {
                       width={36}
                       height={36}
                       alt="user profile"
-                      className="rounded-full"
+                      className="w-[36px] h-[36px] rounded-full object-cover"
                     ></Image>
                   ) : (
                     <FontAwesomeIcon
