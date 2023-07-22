@@ -3,10 +3,17 @@ services:
   nextjs:
     restart: always
     image: alkuinvito/kasirin:latest
-    env_file:
-      - .env
+    env_file: .env
     expose:
       - 3000
+  postgres:
+    restart: always
+    image: postgres
+    ports:
+      - "5432:5432"
+    env_file: .env
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
   tunnel:
     container_name: cloudflared-tunnel
     image: cloudflare/cloudflared
