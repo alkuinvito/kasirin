@@ -4,6 +4,15 @@ import { UserModelSchema } from "@/lib/schema";
 import { Prisma } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import { Role } from "@/lib/schema";
+import { CompressImg } from "@/lib/helper";
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "5mb",
+    },
+  },
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,6 +39,16 @@ export default async function handler(
         }
 
         try {
+          const imgURL = userInput.data.image?.startsWith("http");
+          if (!imgURL) {
+            userInput.data.image = await CompressImg(
+              userInput.data.image || "",
+              64
+            );
+            if (!userInput.data.image)
+              res.status(500).json({ error: "Failed to compress image" });
+          }
+
           const added = await prisma.user.create({
             data: { ...userInput.data, active: false },
           });

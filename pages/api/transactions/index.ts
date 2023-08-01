@@ -165,22 +165,6 @@ export default async function handler(
         }
         return res.status(500).json({ error: "Failed to create transaction" });
       }
-
-    // try {
-    //   const result = await createTransaction(transactionInput.data);
-    //   return res.status(200).json({ id: result });
-    // } catch (e) {
-    //   if (e instanceof Prisma.PrismaClientKnownRequestError) {
-    //     if (e.code === "P2025") {
-    //       return res
-    //         .status(404)
-    //         .json({ error: "Product or variant not found" });
-    //     }
-    //   } else if (typeof e === "string") {
-    //     return res.status(400).json({ error: e });
-    //   }
-    //   return res.status(500).json({ error: "Failed to create transaction" });
-    // }
     default:
       return res.status(405).json({
         error: "Invalid method",
