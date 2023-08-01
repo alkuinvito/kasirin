@@ -141,7 +141,7 @@ export default function AddUser({
                       <Image
                         src={image}
                         alt="Uploaded image"
-                        className="max-w-[150px] h-full max-h-[150px] object-cover rounded-full"
+                        className="max-w-[150px] h-[150px] object-cover rounded-full"
                         width={150}
                         height={150}
                       ></Image>
