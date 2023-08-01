@@ -1,9 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
-import { z } from "zod";
 import { Role, productSchema, variantGroupSchema } from "@/lib/schema";
 import { getToken } from "next-auth/jwt";
+import { CompressImg } from "@/lib/helper";
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "5mb",
+    },
+  },
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -57,6 +65,10 @@ export default async function handler(
             .json({ error: productInput.error.flatten().fieldErrors });
 
         try {
+          const compressed = await CompressImg(productInput.data.image);
+          if (!compressed)
+            res.status(500).json({ error: "Failed to compress image" });
+
           const updated = await prisma.product.update({
             where: {
               permalink: query.data.permalink,
@@ -65,7 +77,7 @@ export default async function handler(
               name: productInput.data.name,
               price: productInput.data.price,
               stock: productInput.data.stock,
-              image: productInput.data.image,
+              image: compressed,
               permalink: productInput.data.permalink,
               category: {
                 connect: { id: productInput.data.categoryId },

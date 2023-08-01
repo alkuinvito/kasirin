@@ -51,7 +51,7 @@ export default function SideBar() {
             width={36}
             height={36}
             alt="user profile"
-            className="rounded-full"
+            className="rounded-full w-[36px] h-[36px] object-cover"
           ></Image>
         ) : (
           <FontAwesomeIcon icon={faCircleUser} className="w-[36px] h-[36px]" />

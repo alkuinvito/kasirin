@@ -51,7 +51,7 @@ export const productSchema = z.object({
   id: z.string().cuid().optional(),
   name: z.string().min(3).max(32),
   price: z.coerce.number().min(0).max(100000000),
-  image: z.string().url(),
+  image: z.string(),
   stock: z.coerce.number().min(0).max(1000).default(0),
   permalink: z
     .string()
