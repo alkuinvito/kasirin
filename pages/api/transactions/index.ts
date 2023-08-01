@@ -1,8 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
-import { TransactionModelSchema, variantSchema } from "@/lib/schema";
+import {
+  OrderModelSchema,
+  TransactionModelSchema,
+  variantSchema,
+} from "@/lib/schema";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import * as _ from "lodash";
 
 export default async function handler(
   req: NextApiRequest,
@@ -64,10 +69,16 @@ export default async function handler(
           .json({ error: "Failed to retrieve transactions" });
       }
     case "POST":
-      const transactionInput = TransactionModelSchema.safeParse(req.body);
+      const transactionInput = TransactionModelSchema.extend({
+        orders: OrderModelSchema.extend({
+          variants: variantSchema.pick({ id: true }).array().optional(),
+        })
+          .array()
+          .nonempty(),
+      }).safeParse(req.body);
       if (!transactionInput.success) {
         return res.status(400).json({
-          error: transactionInput.error.flatten().fieldErrors,
+          error: transactionInput.error,
         });
       }
 
@@ -89,11 +100,17 @@ export default async function handler(
               where: {
                 id: order.productId,
               },
+              include: {
+                variants: {
+                  include: {
+                    items: true,
+                  },
+                },
+              },
             });
 
-            if (product.stock < order.quantity) {
+            if (product.stock < order.quantity)
               throw new Error("Not enough product in stock");
-            }
 
             await tx.product.update({
               where: {
@@ -110,7 +127,32 @@ export default async function handler(
               .array()
               .safeParse(order.variants);
 
+            for (const variants of product.variants) {
+              if (variants.required) {
+                if (!order.variants)
+                  throw new Error(`Missing required variant: ${variants.name}`);
+                if (
+                  _.intersectionBy(variants.items, order.variants, "id")
+                    .length === 0
+                ) {
+                  throw new Error(`Missing required variant: ${variants.name}`);
+                }
+              }
+            }
+
             if (parsedVariants.success) {
+              if (
+                order.variants?.length !== _.uniqBy(order.variants, "id").length
+              )
+                throw new Error("Invalid duplicate variant");
+
+              const validVariants = _.flatten(_.map(product.variants, "items"));
+              if (
+                _.intersectionBy(validVariants, order.variants, "id").length !==
+                order.variants.length
+              )
+                throw new Error("Invalid unknown variants");
+
               await tx.order.create({
                 data: {
                   price: product.price,
