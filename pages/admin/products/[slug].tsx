@@ -91,6 +91,7 @@ export default function Page(
   const [open, setOpen] = useState(false);
   const [openErr, setOpenErr] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(props.product);
+  const [image, setImage] = useState(props.product.image);
 
   const imageRef = useRef<HTMLInputElement>(null);
 
@@ -120,37 +121,13 @@ export default function Page(
       });
   };
 
-  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormErrors((prevState) => ({ ...prevState, image: [] }));
-
-    let data = new FormData();
-    data.append("image", e.target.files?.item(0) as File);
-
-    const options = {
-      method: "POST",
-      url: "/api/images",
-      data: data,
+  const handleChangeImg = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fr = new FileReader();
+    const file = e.target.files?.item(0) as File;
+    fr.onload = () => {
+      setImage(fr.result as string);
     };
-
-    axios
-      .request(options)
-      .then((res) => {
-        const imageUrl = z
-          .object({ image: z.string().url() })
-          .safeParse(res.data);
-        if (imageUrl.success) {
-          setCurrentProduct((prevState) => ({
-            ...prevState,
-            image: imageUrl.data.image,
-          }));
-        }
-      })
-      .catch((err) => {
-        setFormErrors((prevState) => ({
-          ...prevState,
-          image: [err.response.data.error],
-        }));
-      });
+    fr.readAsDataURL(file);
   };
 
   const handleDelete = async () => {
@@ -190,7 +167,7 @@ export default function Page(
     axios
       .patch(
         `/api/products/${props.product.permalink}`,
-        { ...currentProduct, variants: parsedVariants },
+        { ...currentProduct, variants: parsedVariants, image: image },
         { withCredentials: true }
       )
       .then(() => {
@@ -241,7 +218,7 @@ export default function Page(
           <div className="flex gap-16">
             <section>
               <fieldset className="grid">
-                {currentProduct.image ? (
+                {image ? (
                   <div>
                     <button
                       className="w-[320px] h-[320px] flex flex-col items-center justify-center gap-2 opacity-0 hover:opacity-100 absolute text-white bg-black/40 dark:bg-black/70 transition-opacity cursor-pointer"
@@ -253,9 +230,9 @@ export default function Page(
                       <span className="font-medium text-sm">Upload image</span>
                     </button>
                     <Image
-                      src={currentProduct.image}
+                      src={image}
                       alt="Uploaded image"
-                      className="max-w-[320px] h-full max-h-[320px] object-contain bg-gray-100 dark:bg-zinc-800"
+                      className="max-w-[320px] h-[320px] object-contain object-center bg-gray-100 dark:bg-zinc-800"
                       width={320}
                       height={320}
                     ></Image>
@@ -272,7 +249,7 @@ export default function Page(
                   ref={imageRef}
                   type="file"
                   className="hidden"
-                  onChange={(e) => uploadImage(e)}
+                  onChange={(e) => handleChangeImg(e)}
                 />
                 <FieldErrors errors={formErrors?.image} />
               </fieldset>

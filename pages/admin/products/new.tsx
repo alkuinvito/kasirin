@@ -42,7 +42,6 @@ export default function Page() {
     ...productSchema.partial().parse({}),
     variants: variantGroupSchema.partial().array().parse([]),
   });
-  console.log(currentProduct);
 
   const imageRef = useRef<HTMLInputElement>(null);
 
@@ -90,35 +89,13 @@ export default function Page() {
       });
   };
 
-  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormErrors((prevState) => ({ ...prevState, image: [] }));
-
-    let data = new FormData();
-    data.append("image", e.target.files?.item(0) as File);
-
-    const options = {
-      method: "POST",
-      url: "/api/images",
-      data: data,
+  const handleChangeImg = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fr = new FileReader();
+    const file = e.target.files?.item(0) as File;
+    fr.onload = () => {
+      setCurrentProduct(Object.assign(currentProduct, { image: fr.result }));
     };
-
-    axios
-      .request(options)
-      .then((res) => {
-        const imageUrl = z.object({ image: z.string() }).safeParse(res.data);
-        if (imageUrl.success) {
-          setCurrentProduct((prevState) => ({
-            ...prevState,
-            image: imageUrl.data.image,
-          }));
-        }
-      })
-      .catch((err) => {
-        setFormErrors((prevState) => ({
-          ...prevState,
-          image: [err.response.data.error],
-        }));
-      });
+    fr.readAsDataURL(file);
   };
 
   const handleSubmit = async () => {
@@ -204,7 +181,7 @@ export default function Page() {
                     <Image
                       src={currentProduct.image}
                       alt="Uploaded image"
-                      className="max-w-[320px] h-full max-h-[320px] object-contain bg-gray-100 dark:bg-zinc-800"
+                      className="max-w-[320px] h-[320px] object-contain object-center bg-gray-100 dark:bg-zinc-800"
                       width={320}
                       height={320}
                     ></Image>
@@ -221,7 +198,7 @@ export default function Page() {
                   ref={imageRef}
                   type="file"
                   className="hidden"
-                  onChange={(e) => uploadImage(e)}
+                  onChange={(e) => handleChangeImg(e)}
                 />
                 <FieldErrors errors={formErrors?.image} />
               </fieldset>

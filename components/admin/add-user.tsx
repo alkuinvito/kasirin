@@ -41,45 +41,24 @@ export default function AddUser({
     role: "owner",
     gender: "male",
   });
+  const [image, setImage] = useState("");
 
   const imageRef = useRef<HTMLInputElement>(null);
 
-  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormErrors((prevState) => ({ ...prevState, image: [] }));
-
-    let data = new FormData();
-    data.append("image", e.target.files?.item(0) as File);
-
-    const options = {
-      method: "POST",
-      url: "/api/images",
-      data: data,
+  const handleChangeImg = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fr = new FileReader();
+    const file = e.target.files?.item(0) as File;
+    fr.onload = () => {
+      setImage(fr.result as string);
     };
-
-    axios
-      .request(options)
-      .then((res) => {
-        const imageUrl = z.object({ image: z.string() }).safeParse(res.data);
-        if (imageUrl.success) {
-          setInfo((prev) => ({
-            ...prev,
-            image: imageUrl.data.image,
-          }));
-        }
-      })
-      .catch((err) => {
-        setFormErrors((prevState) => ({
-          ...prevState,
-          image: [err.response.data.error],
-        }));
-      });
+    fr.readAsDataURL(file);
   };
 
   const handleSubmit = async () => {
     setError("");
     setFormErrors(defaultErrors);
 
-    if (!info.image) {
+    if (!image) {
       setFormErrors((prev) => ({ ...prev, image: ["Image can not be empty"] }));
       return;
     }
@@ -90,7 +69,7 @@ export default function AddUser({
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      data: info,
+      data: { ...info, image: image },
     };
     axios
       .request(options)
@@ -146,7 +125,7 @@ export default function AddUser({
             <div className="pt-2 flex gap-4">
               <section>
                 <fieldset className="grid">
-                  {info.image ? (
+                  {image ? (
                     <div>
                       <button
                         className="w-[150px] h-[150px] flex flex-col items-center justify-center gap-2 opacity-0 hover:opacity-100 absolute text-white bg-black/40 dark:bg-black/70 rounded-full transition-opacity cursor-pointer"
@@ -160,7 +139,7 @@ export default function AddUser({
                         </span>
                       </button>
                       <Image
-                        src={info.image}
+                        src={image}
                         alt="Uploaded image"
                         className="max-w-[150px] h-full max-h-[150px] object-cover rounded-full"
                         width={150}
@@ -181,7 +160,7 @@ export default function AddUser({
                     ref={imageRef}
                     type="file"
                     className="hidden"
-                    onChange={(e) => uploadImage(e)}
+                    onChange={(e) => handleChangeImg(e)}
                   />
                   <FieldErrors errors={formErrors?.image} />
                 </fieldset>
