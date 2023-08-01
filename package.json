@@ -41,6 +41,7 @@
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.3",
     "formidable": "^3.4.0",
+    "lodash": "^4.17.21",
     "next": "13.4.3",
     "next-auth": "^4.22.1",
     "postcss": "8.4.23",
@@ -52,6 +53,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.196",
     "prisma": "^5.0.0"
   }
 }
