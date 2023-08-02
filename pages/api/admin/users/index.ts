@@ -4,7 +4,7 @@ import { UserModelSchema } from "@/lib/schema";
 import { Prisma } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import { Role } from "@/lib/schema";
-import { CompressImg } from "@/lib/helper";
+import { CompressImg } from "@/lib/image";
 
 export const config = {
   api: {

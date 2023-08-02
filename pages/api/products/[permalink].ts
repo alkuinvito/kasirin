@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { Role, productSchema, variantGroupSchema } from "@/lib/schema";
 import { getToken } from "next-auth/jwt";
-import { CompressImg } from "@/lib/helper";
+import { CompressImg } from "@/lib/image";
 
 export const config = {
   api: {
