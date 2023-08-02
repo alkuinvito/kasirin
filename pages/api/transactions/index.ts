@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
 import {
   OrderModelSchema,
+  OrderVariantSchema,
   TransactionModelSchema,
   variantSchema,
 } from "@/lib/schema";
@@ -24,13 +25,26 @@ export default async function handler(
         let args = {
           where: {},
           include: {
+            user: {
+              select: {
+                name: true,
+              },
+            },
             orders: {
               select: {
-                id: true,
-                productId: true,
+                product: {
+                  select: {
+                    name: true,
+                  },
+                },
                 price: true,
                 quantity: true,
-                variants: true,
+                variants: {
+                  select: {
+                    name: true,
+                    price: true,
+                  },
+                },
                 notes: true,
               },
             },
@@ -64,6 +78,7 @@ export default async function handler(
         const transactions = await prisma.transaction.findMany(args);
         return res.status(200).json({ transactions: transactions });
       } catch (e) {
+        console.log(e);
         return res
           .status(500)
           .json({ error: "Failed to retrieve transactions" });
@@ -147,11 +162,22 @@ export default async function handler(
                 throw new Error("Invalid duplicate variant");
 
               const validVariants = _.flatten(_.map(product.variants, "items"));
-              if (
-                _.intersectionBy(validVariants, order.variants, "id").length !==
-                order.variants.length
-              )
-                throw new Error("Invalid unknown variants");
+              const orderVariant = OrderVariantSchema.omit({
+                orderId: true,
+              }).array();
+              type orderVariantsType = z.infer<typeof orderVariant>;
+              let orderVariants: orderVariantsType = [];
+              for (const variant of order.variants) {
+                const temp = _.intersectionBy(validVariants, [variant], "id");
+                if (temp.length === 0) {
+                  throw new Error("Invalid unknown variant");
+                }
+                orderVariants.push({
+                  variantId: temp[0].id,
+                  name: temp[0].name,
+                  price: temp[0].price,
+                });
+              }
 
               await tx.order.create({
                 data: {
@@ -159,7 +185,7 @@ export default async function handler(
                   quantity: order.quantity,
                   notes: order.notes,
                   variants: {
-                    connect: parsedVariants.data,
+                    create: orderVariants,
                   },
                   product: {
                     connect: {
