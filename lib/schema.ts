@@ -73,6 +73,15 @@ export const categorySchema = z.object({
 
 export type Category = z.infer<typeof categorySchema>;
 
+export const OrderVariantSchema = z.object({
+  orderId: z.string().cuid(),
+  variantId: z.string().cuid(),
+  name: z.string(),
+  price: z.coerce.number().min(0).max(100000000),
+});
+
+export type OrderVariant = z.infer<typeof OrderVariantSchema>;
+
 export const OrderModelSchema = z.object({
   id: z.string().cuid().optional(),
   transactionId: z.string().cuid().optional(),
@@ -80,7 +89,7 @@ export const OrderModelSchema = z.object({
   product: productSchema.optional(),
   price: z.coerce.number().min(0).max(100000000).optional(),
   quantity: z.coerce.number().min(1).max(1000),
-  variants: variantSchema.array().optional(),
+  variants: OrderVariantSchema.array().optional(),
   notes: z.string().max(256).optional(),
 });
 
