@@ -3,10 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL")
+  directUrl         = env("POSTGRES_URL_NON_POOLING")
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model Account {
@@ -42,7 +42,7 @@ model User {
   emailVerified DateTime?
   image         String?
   phone         BigInt?       @unique
-  address       String?       @db.Text
+  address       String?
   gender        String?
   dob           DateTime?
   role          String?
@@ -61,18 +61,18 @@ model VerificationToken {
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String
-  products  Product[]
+  id       String    @id @default(cuid())
+  name     String
+  products Product[]
 }
 
 model Variant {
-  id       String       @id @default(cuid())
-  name     String
-  price    Int          @default(0)
-  groupId  String
-  group    VariantGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  orders   OrderVariant[]
+  id      String         @id @default(cuid())
+  name    String
+  price   Int            @default(0)
+  groupId String
+  orders  OrderVariant[]
+  group   VariantGroup   @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model VariantGroup {
@@ -91,22 +91,21 @@ model Product {
   stock      Int            @default(0)
   permalink  String         @unique
   categoryId String
-  category   Category       @relation(fields: [categoryId], references: [id])
   orders     Order[]
+  category   Category       @relation(fields: [categoryId], references: [id])
   variants   VariantGroup[] @relation("ProductToVariant")
 
-  @@index(name)
+  @@index([name])
 }
 
 model OrderVariant {
+  id        String   @id @default(cuid())
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  variantId String
-  variant   Variant @relation(fields: [variantId], references: [id])
+  variantId String?
   name      String
   price     Int
-
-  @@id([orderId, variantId])
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant   Variant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 }
 
 model Order {
@@ -115,16 +114,27 @@ model Order {
   productId     String
   price         Int
   quantity      Int
-  variants      OrderVariant[]
   notes         String?
-  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   product       Product        @relation(fields: [productId], references: [id])
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  variants      OrderVariant[]
+}
+
+model Fee {
+  id           String   @id @default(cuid())
+  type         String
+  name         String
+  amount       Float
 }
 
 model Transaction {
-  id     String   @id @default(cuid())
-  userId String
-  date   DateTime @default(now())
-  orders Order[]
-  user   User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  id       String   @id @default(cuid())
+  userId   String
+  date     DateTime @default(now())
+  orders   Order[]
+  user     User     @relation(fields: [userId], references: [id])
+  status   String   @default("pending")
+  subtotal Int
+  total    Int
+  method   String   @default("cash")
 }
