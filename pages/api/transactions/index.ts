@@ -9,6 +9,7 @@ import {
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import * as _ from "lodash";
+import { getToken } from "next-auth/jwt";
 
 export default async function handler(
   req: NextApiRequest,
@@ -84,13 +85,22 @@ export default async function handler(
           .json({ error: "Failed to retrieve transactions" });
       }
     case "POST":
+      const token = await getToken({ req });
+      if (!token) {
+        return res
+          .status(401)
+          .json({ error: "Only authenticated user can create transaction" });
+      }
+
       const transactionInput = TransactionModelSchema.extend({
         orders: OrderModelSchema.extend({
           variants: variantSchema.pick({ id: true }).array().optional(),
         })
           .array()
           .nonempty(),
-      }).safeParse(req.body);
+      })
+        .omit({ userId: true })
+        .safeParse(req.body);
       if (!transactionInput.success) {
         return res.status(400).json({
           error: transactionInput.error,
@@ -99,12 +109,17 @@ export default async function handler(
 
       try {
         const result = await prisma.$transaction(async (tx) => {
+          let subtotal = 0,
+            total = 0;
+
           const newTransaction = await tx.transaction.create({
             data: {
+              subtotal: 0,
+              total: 0,
               date: new Date(),
               user: {
                 connect: {
-                  id: transactionInput.data.userId,
+                  id: token.sub,
                 },
               },
             },
@@ -127,15 +142,6 @@ export default async function handler(
             if (product.stock < order.quantity)
               throw new Error("Not enough product in stock");
 
-            await tx.product.update({
-              where: {
-                id: order.productId,
-              },
-              data: {
-                stock: product.stock - order.quantity,
-              },
-            });
-
             const parsedVariants = variantSchema
               .pick({ id: true })
               .required()
@@ -156,6 +162,7 @@ export default async function handler(
             }
 
             if (parsedVariants.success) {
+              let currTotal = 0;
               if (
                 order.variants?.length !== _.uniqBy(order.variants, "id").length
               )
@@ -177,7 +184,11 @@ export default async function handler(
                   name: temp[0].name,
                   price: temp[0].price,
                 });
+                currTotal += temp[0].price;
               }
+              currTotal += product.price;
+
+              subtotal += order.quantity * currTotal;
 
               await tx.order.create({
                 data: {
@@ -200,6 +211,7 @@ export default async function handler(
                 },
               });
             } else {
+              subtotal += order.quantity * product.price;
               await tx.order.create({
                 data: {
                   price: product.price,
@@ -220,7 +232,30 @@ export default async function handler(
             }
           }
 
-          return newTransaction;
+          total += subtotal;
+          const fees = await tx.fee.findMany();
+          for (const fee of fees) {
+            switch (fee.type) {
+              case "flat":
+                total += fee.amount;
+                break;
+              case "percentage":
+                total += subtotal * (fee.amount / 100);
+                break;
+            }
+          }
+
+          const updated = tx.transaction.update({
+            where: {
+              id: newTransaction.id,
+            },
+            data: {
+              subtotal: subtotal,
+              total: total,
+            },
+          });
+
+          return updated;
         });
         return res.status(200).json(result);
       } catch (e) {
