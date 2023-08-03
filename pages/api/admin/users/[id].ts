@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { Role, UserModelSchema } from "@/lib/schema";
 import { getToken } from "next-auth/jwt";
 import z from "zod";
-import { CompressImg } from "@/lib/image";
+import { UploadImg } from "@/lib/image";
 
 export const config = {
   api: {
@@ -51,9 +51,9 @@ export default async function handler(
           try {
             const imgURL = info.data.image?.startsWith("http");
             if (!imgURL) {
-              info.data.image = await CompressImg(info.data.image || "", 64);
+              info.data.image = await UploadImg(info.data.image || "");
               if (!info.data.image)
-                res.status(500).json({ error: "Failed to compress image" });
+                res.status(500).json({ error: "Failed to upload image" });
             }
 
             const updated = await prisma.user.update({

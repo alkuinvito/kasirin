@@ -4,7 +4,7 @@ import { UserModelSchema } from "@/lib/schema";
 import { Prisma } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import { Role } from "@/lib/schema";
-import { CompressImg } from "@/lib/image";
+import { UploadImg } from "@/lib/image";
 
 export const config = {
   api: {
@@ -41,12 +41,9 @@ export default async function handler(
         try {
           const imgURL = userInput.data.image?.startsWith("http");
           if (!imgURL) {
-            userInput.data.image = await CompressImg(
-              userInput.data.image || "",
-              64
-            );
+            userInput.data.image = await UploadImg(userInput.data.image || "");
             if (!userInput.data.image)
-              res.status(500).json({ error: "Failed to compress image" });
+              res.status(500).json({ error: "Failed to upload image" });
           }
 
           const added = await prisma.user.create({
