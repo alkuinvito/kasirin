@@ -39,6 +39,7 @@
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
     "cuid": "^3.0.0",
+    "dayjs": "^1.11.9",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.3",
     "formidable": "^3.4.0",
