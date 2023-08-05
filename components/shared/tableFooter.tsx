@@ -8,31 +8,33 @@ export default function TableFooter({
   visibleRowsLength,
   dataLength,
   page,
-  rowsPerPage,
+  rowsPerPage = 10,
   onChangePage,
   onChangeRowsPerPage,
 }: {
   visibleRowsLength: number | undefined;
   dataLength: number | undefined;
   page: number;
-  rowsPerPage: number;
+  rowsPerPage?: number;
   onChangePage: Function;
-  onChangeRowsPerPage: Function;
+  onChangeRowsPerPage?: Function;
 }) {
   return (
     <div className="py-3 px-6 flex justify-end items-center gap-6">
-      <div>
-        <span className="mr-2">Rows:</span>
-        <select
-          name="rows"
-          id="rows"
-          className="appearance-none pl-3 py-1 rounded-lg dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700 transition-colors"
-          onChange={(e) => onChangeRowsPerPage(e)}
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-        </select>
-      </div>
+      {onChangeRowsPerPage && (
+        <div>
+          <span className="mr-2">Rows:</span>
+          <select
+            name="rows"
+            id="rows"
+            className="appearance-none pl-3 py-1 rounded-lg dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700 transition-colors"
+            onChange={(e) => onChangeRowsPerPage(e)}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+      )}
       <div>
         <span>
           {visibleRowsLength ? page * rowsPerPage + 1 : 0}-
