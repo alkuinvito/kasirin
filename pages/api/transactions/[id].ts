@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import dayjs from "dayjs";
 import { Prisma } from "@prisma/client";
+import { PaymentMethod } from "@/lib/schema";
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,6 +23,11 @@ export default async function handler(
         const result = await prisma.transaction.findFirstOrThrow({
           where: { id: query.data },
           include: {
+            user: {
+              select: {
+                name: true,
+              },
+            },
             orders: {
               include: {
                 product: {
@@ -30,11 +36,24 @@ export default async function handler(
                     image: true,
                   },
                 },
-                variants: true,
+                variants: {
+                  select: {
+                    name: true,
+                    price: true,
+                  },
+                },
               },
             },
           },
         });
+
+        if (
+          dayjs().diff(result.date, "minute") < 5 &&
+          result.status === "expired"
+        ) {
+          result.status = "pending";
+        }
+
         return res.status(200).json({ transaction: result });
       } catch (e) {
         console.error(e);
@@ -48,9 +67,7 @@ export default async function handler(
         return res.status(500).json({ error: "Failed to update transaction" });
       }
     case "PATCH":
-      const input = z
-        .object({ method: z.enum(["cash", "credit", "e-wallet"]) })
-        .safeParse(req.body);
+      const input = z.object({ method: PaymentMethod }).safeParse(req.body);
       if (!input.success) {
         return res.status(400).json({ error: "Invalid payment method" });
       }
@@ -68,11 +85,7 @@ export default async function handler(
             .json({ error: "Transaction has already paid" });
         }
 
-        const now = dayjs(new Date());
-        if (now.diff(dayjs(current.date), "minute") >= 5) {
-          await prisma.transaction.delete({
-            where: { id: query.data },
-          });
+        if (dayjs().diff(dayjs(current.date), "minute") >= 5) {
           return res.status(400).json({ error: "Expired transaction" });
         }
 
