@@ -8,3 +8,11 @@ export function toSnakeCase(str: string): string {
   }
   return "";
 }
+
+export function calculateSkip(current: number) {
+  return current * 10;
+}
+
+export function calculateTotalPage(itemsLen: number) {
+  return Math.ceil(itemsLen / 10);
+}
