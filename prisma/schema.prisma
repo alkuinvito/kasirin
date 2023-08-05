@@ -133,8 +133,8 @@ model Transaction {
   date     DateTime @default(now())
   orders   Order[]
   user     User     @relation(fields: [userId], references: [id])
-  status   String   @default("pending")
+  status   String   @default("expired")
   subtotal Int
   total    Int
-  method   String   @default("cash")
+  method   String?
 }

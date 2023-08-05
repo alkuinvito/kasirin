@@ -17,6 +17,12 @@ export type Role = z.infer<typeof Role>;
 export const Gender = z.enum(["male", "female"]);
 export type Gender = z.infer<typeof Gender>;
 
+export const Status = z.enum(["done", "pending", "expired"]);
+export type Status = z.infer<typeof Status>;
+
+export const PaymentMethod = z.enum(["cash", "card", "e-wallet"]);
+export type PaymentMethod = z.infer<typeof PaymentMethod>;
+
 export const UserModelSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -95,11 +101,41 @@ export const OrderModelSchema = z.object({
 
 export type OrderModel = z.infer<typeof OrderModelSchema>;
 
+export const FeeSchema = z.object({
+  id: z.string().cuid().optional(),
+  type: z.enum(["flat", "percentage"]),
+  name: z.string(),
+  amount: z.number(),
+});
+
+export type Fee = z.infer<typeof FeeSchema>;
+
 export const TransactionModelSchema = z.object({
   id: z.string().cuid().optional(),
   userId: z.string().cuid(),
   date: z.coerce.date().max(new Date()).optional(),
   orders: OrderModelSchema.array().nonempty(),
+  status: Status.optional(),
+  subtotal: z.number().optional(),
+  total: z.number().optional(),
+  method: PaymentMethod.optional(),
+  user: z.object({ name: z.string() }).optional(),
 });
 
 export type TransactionModel = z.infer<typeof TransactionModelSchema>;
+
+export const Transaction = z.object({
+  transaction: TransactionModelSchema.extend({
+    orders: OrderModelSchema.extend({
+      product: productSchema.pick({ name: true, image: true }),
+      variants: variantSchema
+        .pick({ name: true, price: true })
+        .array()
+        .optional(),
+    })
+      .array()
+      .nonempty(),
+  }),
+});
+
+export type Transaction = z.infer<typeof Transaction>;
