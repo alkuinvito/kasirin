@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import * as Separator from "@radix-ui/react-separator";
+import Link from "next/link";
 
 interface Params extends ParsedUrlQuery {
   id: string;
@@ -60,10 +61,10 @@ export default function Page(
   return (
     <MainLayout>
       <div className="mb-2">
-        <a href="/transaction" className="hover:text-indigo-700">
+        <Link href="/transaction" className="hover:text-indigo-700">
           <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
           Back to transaction
-        </a>
+        </Link>
       </div>
       <TransactionDetail tran={props} />
       <div className="p-4 mt-4 w-1/3 float-right rounded-lg bg-gray-100 dark:bg-zinc-900">

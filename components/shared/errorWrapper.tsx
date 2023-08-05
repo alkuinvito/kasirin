@@ -1,5 +1,6 @@
 import { faPersonRunning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 const DEFAULT_ERROR_MSG = "Something went wrong";
 const DEFAULT_REDIRECT_URL = "/";
@@ -18,12 +19,12 @@ export default function ErrorWrapper({
       <div className="grid grow gap-2">
         <h2 className="text-4xl font-bold">{message}</h2>
         {desc && <span>{desc}</span>}
-        <a
+        <Link
           href={redirectUrl}
           className="mt-4 py-2 px-4 w-fit rounded-lg text-white font-medium bg-indigo-600 dark:bg-indigo-800 hover:bg-indigo-700 dark:hover:bg-indigo-900 transition-colors"
         >
           Take me back
-        </a>
+        </Link>
       </div>
       <span className="text-8xl">
         <FontAwesomeIcon icon={faPersonRunning} />
