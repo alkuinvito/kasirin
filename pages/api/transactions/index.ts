@@ -8,8 +8,10 @@ import {
 } from "@/lib/schema";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
-import * as _ from "lodash";
+import _ from "lodash";
 import { getToken } from "next-auth/jwt";
+import { calculateSkip, calculateTotalPage } from "@/lib/helper";
+import dayjs from "dayjs";
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,39 +19,21 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-      const { start, end, cashier } = req.query;
+      const { start, end, cashier, page, status } = req.query;
       const startDate = z.coerce.date().safeParse(start);
       const endDate = z.coerce.date().safeParse(end);
       const userId = z.string().cuid().safeParse(cashier);
+      const pageParam = z.coerce
+        .number()
+        .min(0)
+        .optional()
+        .default(0)
+        .parse(page);
+      const statusParam = z.string().optional().default("").parse(status);
 
       try {
         let args = {
           where: {},
-          include: {
-            user: {
-              select: {
-                name: true,
-              },
-            },
-            orders: {
-              select: {
-                product: {
-                  select: {
-                    name: true,
-                  },
-                },
-                price: true,
-                quantity: true,
-                variants: {
-                  select: {
-                    name: true,
-                    price: true,
-                  },
-                },
-                notes: true,
-              },
-            },
-          },
         };
 
         if (startDate.success && endDate.success) {
@@ -76,8 +60,49 @@ export default async function handler(
           };
         }
 
-        const transactions = await prisma.transaction.findMany(args);
-        return res.status(200).json({ transactions: transactions });
+        if (statusParam) {
+          if (statusParam === "pending") {
+            _.set(args, "where.status", "expired");
+            _.set(args, "where.date", {
+              gt: dayjs().subtract(5, "minute").toDate(),
+            });
+          } else {
+            _.set(args, "where.status", statusParam);
+          }
+        }
+
+        const counter = await prisma.transaction.count(args);
+        const transactions = await prisma.transaction.findMany({
+          skip: calculateSkip(pageParam),
+          take: 10,
+          ...args,
+          include: {
+            user: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          orderBy: [{ date: "desc" }],
+        });
+
+        for (const transaction of transactions) {
+          if (
+            dayjs().diff(transaction.date, "minute") < 5 &&
+            transaction.status === "expired"
+          ) {
+            transaction.status = "pending";
+          }
+        }
+
+        console.log(args);
+
+        return res.status(200).json({
+          transactions: transactions,
+          page: pageParam,
+          totalPage: calculateTotalPage(counter),
+          total: counter,
+        });
       } catch (e) {
         console.log(e);
         return res
@@ -257,6 +282,7 @@ export default async function handler(
 
           return updated;
         });
+        result.status = "pending";
         return res.status(200).json(result);
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
