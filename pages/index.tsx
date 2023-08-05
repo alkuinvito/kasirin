@@ -101,7 +101,8 @@ export default function Home() {
         { ...newOrder, product: product, id: newId },
       ]);
     } else {
-      console.error("Not enough product stock");
+      setToastErr("Not enough product in stock");
+      setOpenErr(true);
     }
   };
 
