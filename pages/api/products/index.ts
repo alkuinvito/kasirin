@@ -34,8 +34,8 @@ export default async function handler(
           },
           include: {
             variants: {
-              select: {
-                name: true,
+              include: {
+                items: true,
               },
             },
           },
@@ -45,8 +45,8 @@ export default async function handler(
       const products = await prisma.product.findMany({
         include: {
           variants: {
-            select: {
-              name: true,
+            include: {
+              items: true,
             },
           },
         },
