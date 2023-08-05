@@ -2,11 +2,19 @@ import React, { ReactNode, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import z from "zod";
 import { OrderModelSchema, productSchema } from "@/lib/schema";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
 
 const Product = productSchema.deepPartial().optional();
 type Product = z.infer<typeof Product>;
+
+const Order = OrderModelSchema.pick({
+  productId: true,
+  notes: true,
+  quantity: true,
+  variants: true,
+}).extend({ variants: z.object({ id: z.string().cuid() }).array().optional() });
+type Order = z.infer<typeof Order>;
 
 export default function AddOrder({
   product,
@@ -17,30 +25,11 @@ export default function AddOrder({
   onUpdate: Function;
   children: ReactNode;
 }) {
-  const { register, handleSubmit } = useForm();
-  const [order, setOrder] = useState(
-    OrderModelSchema.deepPartial().parse({
-      productId: product?.id,
-      quantity: 1,
-      variants: [],
-    })
-  );
+  const { register, handleSubmit } = useForm<Order>();
   const [open, setOpen] = useState(false);
-  const variant = new Map();
 
-  const handleVariantChange = (variantId: string, itemId: string) => {
-    if (itemId) {
-      variant.set(variantId, itemId);
-    } else {
-      variant.delete(variantId);
-    }
-  };
-
-  const handleUpdate = () => {
-    const variantsArr = Array.from(variant.values());
-    const variantsObj = variantsArr.map((val) => ({ id: val }));
-
-    onUpdate({ ...order, variants: variantsObj });
+  const handleUpdate: SubmitHandler<Order> = (data) => {
+    onUpdate(data);
     setOpen(false);
   };
 
@@ -54,6 +43,10 @@ export default function AddOrder({
             Add New Order
           </Dialog.Title>
           <form onSubmit={handleSubmit(handleUpdate)}>
+            <input
+              {...register("productId", { value: product?.id })}
+              type="hidden"
+            />
             <div className="flex gap-4">
               <div>
                 <Image
@@ -66,15 +59,9 @@ export default function AddOrder({
                 <fieldset className="grid mt-2">
                   <label htmlFor="note">Note</label>
                   <textarea
-                    {...register("note")}
+                    {...register("notes")}
                     id="note"
                     className="resize-none h-16 p-2 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
-                    onInput={(e) =>
-                      setOrder((prev) => ({
-                        ...prev,
-                        notes: (e.target as HTMLInputElement).value,
-                      }))
-                    }
                   />
                 </fieldset>
               </div>
@@ -94,25 +81,20 @@ export default function AddOrder({
                   </span>
                 </div>
                 <fieldset className="mb-2">
-                  <label htmlFor="stock">
+                  <label htmlFor="quantity">
                     Qty<span className="text-red-600">&nbsp;*</span>
                   </label>
                   <input
-                    {...(register("stock"),
-                    { required: true, min: 1, max: product?.stock })}
-                    type="number"
+                    {...register("quantity", {
+                      valueAsNumber: true,
+                      min: 1,
+                      max: product?.stock,
+                    })}
                     className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950"
-                    id="stock"
-                    value={order.quantity || 1}
+                    id="quantity"
+                    type="number"
                     min={1}
-                    max={product?.stock || 32}
-                    onChange={(e) => {
-                      setOrder((prev) => ({
-                        ...prev,
-                        quantity: parseInt(e.target.value),
-                      }));
-                    }}
-                    required={true}
+                    max={product?.stock}
                   />
                 </fieldset>
                 {product?.variants && (
@@ -126,17 +108,10 @@ export default function AddOrder({
                           )}
                         </label>
                         <select
-                          {...(register(variant.id || ""),
-                          { required: variant.required })}
+                          {...register(`variants.${i}.id`)}
                           id={variant.id}
                           className="w-full py-2 px-3 bg-gray-100 dark:bg-zinc-900 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-950 focus:bg-gray-200 dark:focus:bg-zinc-950 appearance-none"
                           required={variant.required}
-                          onChange={(e) =>
-                            handleVariantChange(
-                              variant.id as string,
-                              e.target.value
-                            )
-                          }
                         >
                           <option value="">-</option>
                           {variant.items?.map((item) => (
