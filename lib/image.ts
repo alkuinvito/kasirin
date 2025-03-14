@@ -1,11 +1,11 @@
 import cuid from "cuid";
 import { MinioClient } from "./minio";
 
-const sharp = require("sharp");
+import sharp from "sharp";
 
 export async function CompressImg(
   image: string,
-  size: number
+  size: number,
 ): Promise<Buffer> {
   const parts = image.split(";");
   const imageData = parts[1].split(",")[1];
@@ -27,9 +27,9 @@ export async function UploadImg(image: string, size = 320): Promise<string> {
   const img = await CompressImg(image, size);
   try {
     await MinioClient.putObject(
-      process.env.MINIO_BUCKET_NAME,
+      process.env.MINIO_BUCKET,
       `${filename}.webp`,
-      img
+      img,
     );
     return `${process.env.ASSETS_URL}/${filename}.webp`;
   } catch (err) {

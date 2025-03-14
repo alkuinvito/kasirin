@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "assets.enigme.dev",
+        hostname: "assets.techtoniclabs.id",
         port: "",
         pathname: "/**",
       },
